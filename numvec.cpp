@@ -1,5 +1,5 @@
 //
-// Created by Austin Clyde on 4/4/18.
+// Created by Todd Dupont
 //
 
 #include "numvec.h"

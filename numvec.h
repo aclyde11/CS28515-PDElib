@@ -1,5 +1,5 @@
 //
-// Created by Austin Clyde on 4/4/18.
+// Created by Todd Dupont
 //
 
 #ifndef CS28515PROJ1_NUMVEC_H
@@ -12,7 +12,6 @@
 #include "utility.h"
 
 typedef std::vector<double> NumVec;
-
 
 NumVec operator+(const NumVec& A, const NumVec& B); // A+B
 NumVec operator*( double a, const NumVec& B); // a*B
