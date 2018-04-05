@@ -2,14 +2,14 @@
 // Created by Austin Clyde on 4/4/18.
 //
 
-
 #include "tridiag.h"
 
 TriDiag::TriDiag(int n) {
   dim = n;
-  std::fill_n(d.begin(), n, 0.0);
-  std::fill_n(a.begin(), n-1, 0.0);
-  std::fill_n(b.begin(), n-1, 0.0);
+  d.resize(5);
+  std::fill_n(d.begin(), 5, 0.0);
+  b = d;
+  a = d;
 }
 
 TriDiag::TriDiag(const TriDiag& A) {
@@ -70,6 +70,23 @@ TriDiag operator*( double a, const TriDiag& B) {
   return C;
 }
 
+//TODO: Make better for tridiag, not general multplciation;
+NumVec operator*(const TriDiag& A, const NumVec& v) {
+  if (A.dim != v.size()) {
+    error("TriDiag * vector: bad sizes");
+  }
+  NumVec y(v);
+  double d;
+  for(int i = 0; i < A.dim; i++) {
+    d = 0.0;
+    for(int j = 0; j < A.dim; j++) {
+      d += A(i,j) * v[j];
+    }
+    y[i] = d;
+  }
+  return y;
+}
+
 TriDiag operator+(const TriDiag& A, const TriDiag& B) {
   return binary(A, B, std::plus<double>());
 }
@@ -77,6 +94,39 @@ TriDiag operator+(const TriDiag& A, const TriDiag& B) {
 TriDiag operator-(const TriDiag& A, const TriDiag& B) {
   return binary(A, B, std::minus<double>());
 }
+
+/**
+ * Thomas algorithm (named after Llewellyn Thomas), is a simplified form of Gaussian elimination
+ */
+NumVec solveTriDiagMatrix(const TriDiag& A, const NumVec& y) {
+  if(A.dim != y.size()){
+    error("SolveTriDiagMatrix, vector and matrix are different dims.");
+  }
+
+  NumVec d(y);
+  NumVec x(d);
+  NumVec c(A.a);
+  int n = A.dim;
+
+  //forward sweep
+  c[0] = c[0] / A.d[0];
+  for (int i = 1; i < n-1; i++) {
+    c[i] = c[i] / (A.d[i] - A.b[i-1] * c[i-1]);
+  }
+
+  d[0] = d[0] / A.d[0];
+  for (int i = 1; i < n; i++) {
+    d[i] = (d[i] - A.b[i-1] * d[i-1]) / (A.d[i] - A.b[i-1] * c[i-1]);
+  }
+
+  //back sub
+  x[n-1] = d[n-1];
+  for(int i = n - 2; i >= 0; i--) {
+    x[i] = d[i] - c[i] * x[i+1];
+  }
+  return x;
+}
+
 
 std::ostream& operator<<(std::ostream& os, const TriDiag A){
   for (int i = 0; i < A.dim; i++){

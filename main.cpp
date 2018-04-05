@@ -2,12 +2,23 @@
 #include "tridiag.h"
 
 int main() {
-  TriDiag A(3);
-  A(1,1) = 2;
-  std::cout << (10.0 * A)<< std::endl;
+  TriDiag A(5);
+  for(int i = 0; i<4; i++) {
+    A(i,i) = i+1;
+    A(i+1,i) = i*0.25;
+    A(i,i+1) = i*2;
+  }
+  A(4,4) = 5;
+  std::cout << A << std::endl;
 
-  TriDiag B(3);
-  B(1,1) = 1;
-  B(0,0) = 1;
-  std::cout << A+B << std::endl;
+
+  NumVec d(5);
+  for(int i = 0; i < 5; i++) {
+    d[i] = i;
+  }
+  std::cout << d << std::endl;
+
+  NumVec x = solveTriDiagMatrix(A, d);
+  std::cout << x << std::endl;
+  std::cout << (A*x) << std::endl;
 }
