@@ -3,5 +3,10 @@ project(CS28515Proj1)
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(SOURCE_FILES main.cpp utility.cpp utility.h numvec.cpp numvec.h tridiag.cpp tridiag.h)
-add_executable(CS28515Proj1 ${SOURCE_FILES})
+FIND_PACKAGE(GTest)
+
+
+SET(CMAKE_INCLUDE_CURRENT_DIR ON)
+ADD_SUBDIRECTORY(main)
+ADD_SUBDIRECTORY(libnumerical)
+ADD_SUBDIRECTORY(test)

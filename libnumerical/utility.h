@@ -9,8 +9,7 @@
 #include <iostream>
 #include <string>
 
-void error( std::string s );
-void warning( std::string s, std::ostream& out=std::cerr );
-inline double sq( double t ) {return t*t;}
+void error(std::string s);
+void warning(std::string s, std::ostream &out = std::cerr);
 
 #endif //CS28515PROJ1_UTILITY_H
