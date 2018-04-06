@@ -4,10 +4,17 @@
 
 #include "tridiag.h"
 
+TriDiag::TriDiag() {
+  dim = 1;
+  d.push_back(0.0);
+  a.push_back(0.0);
+  b.push_back(0.0);
+}
+
 TriDiag::TriDiag(int n) {
   dim = n;
-  d.resize(5);
-  std::fill_n(d.begin(), 5, 0.0);
+  d.resize(n);
+  std::fill_n(d.begin(), n, 0.0);
   b = d;
   a = d;
 }
@@ -17,6 +24,20 @@ TriDiag::TriDiag(const TriDiag &A) {
   d = A.d;
   a = A.a;
   b = A.b;
+}
+
+TriDiag::TriDiag(int n, double p) {
+  dim = n;
+  d.resize(n);
+  std::fill_n(d.begin(), n, p);
+  b = d;
+  a = d;
+}
+
+bool TriDiag::operator==(const TriDiag& B) {
+  if (dim != B.dim)
+    return false;
+  return (d == B.d) && (a == B.a) && (b == B.b);
 }
 
 double &TriDiag::operator()(int i, int j) {

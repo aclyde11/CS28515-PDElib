@@ -20,10 +20,13 @@ class TriDiag {
   NumVec d;
   NumVec b;
 
+  TriDiag();
   TriDiag(int n);
+  TriDiag(int n, double p);
   TriDiag(const TriDiag &A);
   double &operator()(int i, int j);
   double operator()(int i, int j) const;
+  bool operator==(const TriDiag& B);
 };
 
 void map(TriDiag &A, std::function<double(double)> func);

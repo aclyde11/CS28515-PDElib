@@ -1,4 +1,4 @@
-file(GLOB TEST_NUM *.cpp)
+file(GLOB TEST_NUM *.cpp *.h)
 
 ADD_EXECUTABLE(testlibnumerical ${TEST_NUM})
 
