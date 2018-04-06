@@ -2,6 +2,7 @@
 #include "tridiag.h"
 
 int main() {
+  /*
   TriDiag A(5);
   for(int i = 0; i<4; i++) {
     A(i,i) = i+1;
@@ -27,5 +28,6 @@ int main() {
   std::cout << test << std::endl;
 
   std::cout << test.det() << std::endl;
+   */
 
 }

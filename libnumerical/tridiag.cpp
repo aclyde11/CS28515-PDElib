@@ -2,8 +2,6 @@
 // Created by Austin Clyde on 4/4/18.
 //
 
-
-
 #include "tridiag.h"
 
 TriDiag::TriDiag() {
@@ -86,52 +84,52 @@ double TriDiag::operator()(int i, int j) const {
     return 0.0;
 }
 
-void map(TriDiag &A, std::function<double(double)> func) {
-  std::transform(A.d.begin(), A.d.end(), A.d.begin(), func);
-  std::transform(A.a.begin(), A.a.end(), A.a.begin(), func);
-  std::transform(A.b.begin(), A.b.end(), A.b.begin(), func);
+void TriDiag::map(std::function<double(double)> func) {
+  std::transform(d.begin(), d.end(), d.begin(), func);
+  std::transform(a.begin(), a.end(), a.begin(), func);
+  std::transform(b.begin(), b.end(), b.begin(), func);
 }
 
-TriDiag binary(const TriDiag &A, const TriDiag &B, std::function<double(double, double)> func) {
-  if (A.dim != B.dim)
+TriDiag TriDiag::binary(const TriDiag &B, std::function<double(double, double)> func) {
+  if (dim != B.dim)
     error("TriDiag +: incompatible sizes");
 
-  TriDiag C(A.dim);
-  std::transform(A.d.begin(), A.d.end(), B.d.begin(), C.d.begin(), func);
-  std::transform(A.a.begin(), A.a.end(), B.a.begin(), C.a.begin(), func);
-  std::transform(A.b.begin(), A.b.end(), B.b.begin(), C.b.begin(), func);
+  TriDiag C(dim);
+  std::transform(d.begin(), d.end(), B.d.begin(), C.d.begin(), func);
+  std::transform(a.begin(), a.end(), B.a.begin(), C.a.begin(), func);
+  std::transform(b.begin(), b.end(), B.b.begin(), C.b.begin(), func);
   return C;
 }
 
 TriDiag operator*(double a, const TriDiag &B) {
   TriDiag C(B);
-  map(C, [a](double b) -> double { return a * b; });
+  C.map([a](double b) -> double { return a * b; });
   return C;
 }
 
 //TODO: Make better for tridiag, not general multplciation;
-NumVec operator*(const TriDiag &A, const NumVec &v) {
-  if (A.dim != v.size()) {
+NumVec TriDiag::operator*(const NumVec &v) {
+  if (dim != v.size()) {
     error("TriDiag * vector: bad sizes");
   }
   NumVec y(v);
   double d;
-  for (int i = 0; i < A.dim; i++) {
+  for (int i = 0; i < dim; i++) {
     d = 0.0;
-    for (int j = 0; j < A.dim; j++) {
-      d += A(i, j) * v[j];
+    for (int j = 0; j < dim; j++) {
+      d += this->operator()(i,j) * v[j];
     }
     y[i] = d;
   }
   return y;
 }
 
-TriDiag operator+(const TriDiag &A, const TriDiag &B) {
-  return binary(A, B, std::plus<double>());
+TriDiag TriDiag::operator+(const TriDiag &B) {
+  return this->binary(B, std::plus<double>());
 }
 
-TriDiag operator-(const TriDiag &A, const TriDiag &B) {
-  return binary(A, B, std::minus<double>());
+TriDiag TriDiag::operator-(const TriDiag &B) {
+  return this->binary( B, std::minus<double>());
 }
 
 double TriDiag::det() {

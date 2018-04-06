@@ -27,7 +27,12 @@ class TriDiag {
 
   double &operator()(int i, int j);
   double operator()(int i, int j) const;
-  bool operator==(const TriDiag& B);
+  bool operator==(const TriDiag &B);
+  TriDiag operator+(const TriDiag &B); // A+B
+  NumVec operator*(const NumVec &v);
+  TriDiag operator-(const TriDiag &B);
+  void map(std::function<double(double)> func);
+
   double det();
   void randomize();
   void randomize(int start, int end);
@@ -35,16 +40,13 @@ class TriDiag {
 
  private:
   double det_f(int i);
+  TriDiag binary(const TriDiag &B, std::function<double(double, double)> func);
 };
 
-void map(TriDiag &A, std::function<double(double)> func);
-TriDiag operator+(const TriDiag &A, const TriDiag &B); // A+B
 TriDiag operator*(double a, const TriDiag &B); // a*B#
-NumVec operator*(const TriDiag &A, const NumVec &v);
-TriDiag operator-(const TriDiag &A, const TriDiag &B); // A-B
+std::ostream &operator<<(std::ostream &os, const TriDiag A);
 
 NumVec solveTriDiagMatrix(const TriDiag &A, const NumVec &d);
 
-std::ostream &operator<<(std::ostream &os, const TriDiag A);
 
 #endif //CS28515PROJ1_TRIDIAG_H
