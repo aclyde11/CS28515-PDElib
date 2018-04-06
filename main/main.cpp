@@ -30,4 +30,12 @@ int main() {
   std::cout << test.det() << std::endl;
    */
 
+  TriDiag A(5);
+  A.randomize(1, 100);
+  NumVec v = randomVector(5, 0, 100);
+  std::cout << A << std::endl;
+  std::cout << v << std::endl;
+  std::cout << A*v << std::endl;
+  std::cout << A << std::endl;
+  std::cout << v << std::endl;
 }

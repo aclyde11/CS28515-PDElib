@@ -50,7 +50,7 @@ void TriDiag::randomizeReals(double start, double end) {
   d = randomRealVector(dim, start, end);
 }
 
-bool TriDiag::operator==(const TriDiag& B) {
+bool TriDiag::operator==(const TriDiag& B) const{
   if (dim != B.dim)
     return false;
   return (d == B.d) && (a == B.a) && (b == B.b);
@@ -90,7 +90,7 @@ void TriDiag::map(std::function<double(double)> func) {
   std::transform(b.begin(), b.end(), b.begin(), func);
 }
 
-TriDiag TriDiag::binary(const TriDiag &B, std::function<double(double, double)> func) {
+TriDiag TriDiag::binary(const TriDiag &B, std::function<double(double, double)> func) const{
   if (dim != B.dim)
     error("TriDiag +: incompatible sizes");
 
@@ -108,7 +108,7 @@ TriDiag operator*(double a, const TriDiag &B) {
 }
 
 //TODO: Make better for tridiag, not general multplciation;
-NumVec TriDiag::operator*(const NumVec &v) {
+NumVec TriDiag::operator*(const NumVec &v) const{
   if (dim != v.size()) {
     error("TriDiag * vector: bad sizes");
   }
@@ -124,11 +124,11 @@ NumVec TriDiag::operator*(const NumVec &v) {
   return y;
 }
 
-TriDiag TriDiag::operator+(const TriDiag &B) {
+TriDiag TriDiag::operator+(const TriDiag &B) const{
   return this->binary(B, std::plus<double>());
 }
 
-TriDiag TriDiag::operator-(const TriDiag &B) {
+TriDiag TriDiag::operator-(const TriDiag &B) const{
   return this->binary( B, std::minus<double>());
 }
 
@@ -177,7 +177,7 @@ NumVec solveTriDiagMatrix(const TriDiag &A, const NumVec &y) {
   return x;
 }
 
-std::ostream &operator<<(std::ostream &os, const TriDiag A) {
+std::ostream &operator<<(std::ostream &os, const TriDiag& A) {
   for (int i = 0; i < A.dim; i++) {
     for (int j = 0; j < A.dim; j++) {
       std::cout << A(i, j) << "\t";

@@ -35,3 +35,21 @@ TEST_F(TriDiagTest, MatrixAdd) {
   result = TriDiag(3,2);
   EXPECT_TRUE((m1+m2) == result);
 }
+
+TEST_F(TriDiagTest, MatrixVectorMultiply) {
+  m1 = TriDiag(1, 1);
+  NumVec v = randomVector(1, 1, 100);
+  EXPECT_TRUE(v == m1 * v);
+}
+
+TEST_F(TriDiagTest, TriDiagTest_Scalar_Test){
+  m1 = TriDiag(4,1);
+  double p = 3.141;
+  EXPECT_TRUE((p * m1)(0,1) == p);
+}
+
+TEST_F(TriDiagTest, MatrixVectorDimFail) {
+  m1 = TriDiag(2,0);
+  NumVec v = randomVector(3, 1, 100);
+  ASSERT_DEATH(m1 * v, "");
+}
