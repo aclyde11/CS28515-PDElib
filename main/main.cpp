@@ -21,4 +21,11 @@ int main() {
   NumVec x = solveTriDiagMatrix(A, d);
   std::cout << x << std::endl;
   std::cout << (A*x) << std::endl;
+
+  TriDiag test(3);
+  test.randomize(1, 10);
+  std::cout << test << std::endl;
+
+  std::cout << test.det() << std::endl;
+
 }

@@ -7,7 +7,7 @@
 
 #include <cstdlib>
 #include <iostream>
-#include<vector>
+#include <vector>
 
 #include "utility.h"
 #include "numvec.h"
@@ -24,9 +24,17 @@ class TriDiag {
   TriDiag(int n);
   TriDiag(int n, double p);
   TriDiag(const TriDiag &A);
+
   double &operator()(int i, int j);
   double operator()(int i, int j) const;
   bool operator==(const TriDiag& B);
+  double det();
+  void randomize();
+  void randomize(int start, int end);
+  void randomizeReals(double start, double end);
+
+ private:
+  double det_f(int i);
 };
 
 void map(TriDiag &A, std::function<double(double)> func);

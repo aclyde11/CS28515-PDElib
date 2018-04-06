@@ -1,7 +1,8 @@
 //
 // Created by Todd Dupont
 //
-
+#include <algorithm>
+#include <random>
 #include "numvec.h"
 
 NumVec operator+(const NumVec& A, const NumVec& B) { // A+B
@@ -44,4 +45,24 @@ std::ostream& operator<<(std::ostream& os, const NumVec& A) {
    }
  os << "\n";
  return os;
+}
+
+NumVec randomVector(int length, int start, int end) {
+  std::random_device rnd_device;
+  std::mt19937 mersenne_engine(rnd_device());
+  std::uniform_int_distribution<int> distr(start, end);
+  auto gen = std::bind(distr, mersenne_engine);
+  NumVec r(length);
+  generate(r.begin(), r.end(), gen);
+  return r;
+}
+
+NumVec randomRealVector(int length, double start, double end) {
+  std::random_device rnd_device;
+  std::mt19937 mersenne_engine(rnd_device());
+  std::uniform_real_distribution<double> distr(start, end);
+  auto gen = std::bind(distr, mersenne_engine);
+  NumVec r(length);
+  generate(r.begin(), r.end(), gen);
+  return r;
 }

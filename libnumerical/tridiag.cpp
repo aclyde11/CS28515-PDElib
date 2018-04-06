@@ -2,6 +2,8 @@
 // Created by Austin Clyde on 4/4/18.
 //
 
+
+
 #include "tridiag.h"
 
 TriDiag::TriDiag() {
@@ -32,6 +34,22 @@ TriDiag::TriDiag(int n, double p) {
   std::fill_n(d.begin(), n, p);
   b = d;
   a = d;
+}
+
+void TriDiag::randomize() {
+  randomize(1, 100);
+}
+
+void TriDiag::randomize(int start, int end) {
+  a = randomVector(dim - 1, start, end);
+  b = randomVector(dim - 1, start, end);
+  d = randomVector(dim, start, end);
+}
+
+void TriDiag::randomizeReals(double start, double end) {
+  a = randomRealVector(dim - 1, start, end);
+  b = randomRealVector(dim - 1, start, end);
+  d = randomRealVector(dim, start, end);
 }
 
 bool TriDiag::operator==(const TriDiag& B) {
@@ -114,6 +132,19 @@ TriDiag operator+(const TriDiag &A, const TriDiag &B) {
 
 TriDiag operator-(const TriDiag &A, const TriDiag &B) {
   return binary(A, B, std::minus<double>());
+}
+
+double TriDiag::det() {
+  return det_f(dim-1);
+}
+
+double TriDiag::det_f(int i) {
+  if(i == -2)
+    return 0;
+  else if (i == -1)
+    return 1;
+
+  return d[i] * det_f(i-1) - a[i-1]*b[i-1]*det_f(i-2);
 }
 
 /**

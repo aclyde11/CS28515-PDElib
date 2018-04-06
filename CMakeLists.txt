@@ -3,10 +3,13 @@ project(CS28515Proj1)
 
 set(CMAKE_CXX_STANDARD 11)
 
-FIND_PACKAGE(GTest)
-
-
 SET(CMAKE_INCLUDE_CURRENT_DIR ON)
 ADD_SUBDIRECTORY(main)
 ADD_SUBDIRECTORY(libnumerical)
-ADD_SUBDIRECTORY(test)
+
+option (enable-test "Compile all project unit tests" ON)
+
+if (enable-test)
+    ADD_SUBDIRECTORY(test)
+    FIND_PACKAGE(GTest)
+endif()
