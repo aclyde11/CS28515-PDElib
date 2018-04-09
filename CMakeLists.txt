@@ -14,3 +14,8 @@ if (enable-test)
     ADD_SUBDIRECTORY(test)
     FIND_PACKAGE(GTest)
 endif()
+
+
+# Run test cases:
+
+# Run python graph to make pictures.
