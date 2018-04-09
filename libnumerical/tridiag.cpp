@@ -50,7 +50,7 @@ void TriDiag::randomizeReals(double start, double end) {
   d = randomRealVector(dim, start, end);
 }
 
-bool TriDiag::operator==(const TriDiag& B) const{
+bool TriDiag::operator==(const TriDiag &B) const {
   if (dim != B.dim)
     return false;
   return (d == B.d) && (a == B.a) && (b == B.b);
@@ -90,7 +90,7 @@ void TriDiag::map(std::function<double(double)> func) {
   std::transform(b.begin(), b.end(), b.begin(), func);
 }
 
-TriDiag TriDiag::binary(const TriDiag &B, std::function<double(double, double)> func) const{
+TriDiag TriDiag::binary(const TriDiag &B, std::function<double(double, double)> func) const {
   if (dim != B.dim)
     error("TriDiag +: incompatible sizes");
 
@@ -108,7 +108,7 @@ TriDiag operator*(double a, const TriDiag &B) {
 }
 
 //TODO: Make better for tridiag, not general multplciation;
-NumVec TriDiag::operator*(const NumVec &v) const{
+NumVec TriDiag::operator*(const NumVec &v) const {
   if (dim != v.size()) {
     error("TriDiag * vector: bad sizes");
   }
@@ -116,9 +116,9 @@ NumVec TriDiag::operator*(const NumVec &v) const{
   double d;
   for (int i = 0; i < dim; i++) {
     d = 0.0;
-    for (int j = i-1; j < dim && j <= i+1; j++) {
-      if(j >= 0)
-        d += this->operator()(i,j) * v[j];
+    for (int j = i - 1; j < dim && j <= i + 1; j++) {
+      if (j >= 0)
+        d += this->operator()(i, j) * v[j];
     }
     y[i] = d;
   }
@@ -126,16 +126,15 @@ NumVec TriDiag::operator*(const NumVec &v) const{
 }
 
 //TODO: Make better for tridiag, not general multplciation;
-TriDiag TriDiag::operator*(const TriDiag& B) const{
+TriDiag TriDiag::operator*(const TriDiag &B) const {
   if (dim != B.dim)
     error("TriDiag * TriDiag: bad sizes");
 
   TriDiag P(dim);
-  double d = 0;
-  for(int i = 0; i < dim; i++) {
-    for(int j = i-1; j < dim && j <= i+1; j++) {
+  for (int i = 0; i < dim; i++) {
+    for (int j = i - 1; j < dim && j <= i + 1; j++) {
       if (j >= 0)
-        P(i,j) = (this->getRow(i) , B.getCol(j)); //NumVec inner product
+        P(i, j) = (this->getRow(i), B.getCol(j)); //NumVec inner product
     }
   }
   return P;
@@ -143,37 +142,37 @@ TriDiag TriDiag::operator*(const TriDiag& B) const{
 
 NumVec TriDiag::getRow(int r) const {
   NumVec row(dim);
-  for(int i = 0; i < dim; i++)
-    row[i] = this->operator()(r,i);
+  for (int i = 0; i < dim; i++)
+    row[i] = this->operator()(r, i);
   return row;
 }
 
 NumVec TriDiag::getCol(int c) const {
   NumVec col(dim);
-  for(int i = 0; i < dim; i++)
-    col[i] = this->operator()(i,c);
+  for (int i = 0; i < dim; i++)
+    col[i] = this->operator()(i, c);
   return col;
 }
 
-TriDiag TriDiag::operator+(const TriDiag &B) const{
+TriDiag TriDiag::operator+(const TriDiag &B) const {
   return this->binary(B, std::plus<double>());
 }
 
-TriDiag TriDiag::operator-(const TriDiag &B) const{
-  return this->binary( B, std::minus<double>());
+TriDiag TriDiag::operator-(const TriDiag &B) const {
+  return this->binary(B, std::minus<double>());
 }
 
 double TriDiag::det() {
-  return det_f(dim-1);
+  return det_f(dim - 1);
 }
 
 double TriDiag::det_f(int i) {
-  if(i == -2)
+  if (i == -2)
     return 0;
   else if (i == -1)
     return 1;
 
-  return d[i] * det_f(i-1) - a[i-1]*b[i-1]*det_f(i-2);
+  return d[i] * det_f(i - 1) - a[i - 1] * b[i - 1] * det_f(i - 2);
 }
 
 /**
@@ -208,7 +207,7 @@ NumVec solveTriDiagMatrix(const TriDiag &A, const NumVec &y) {
   return x;
 }
 
-std::ostream &operator<<(std::ostream &os, const TriDiag& A) {
+std::ostream &operator<<(std::ostream &os, const TriDiag &A) {
   for (int i = 0; i < A.dim; i++) {
     for (int j = 0; j < A.dim; j++) {
       std::cout << A(i, j) << "\t";

@@ -37,10 +37,9 @@ class TriDiag {
   bool operator==(const TriDiag &B) const;
   TriDiag operator+(const TriDiag &B) const; // A+B
   NumVec operator*(const NumVec &v) const;
-  TriDiag operator*(const TriDiag& B) const;
+  TriDiag operator*(const TriDiag &B) const;
   TriDiag operator-(const TriDiag &B) const;
   void map(std::function<double(double)> func);
-
 
   //Getters
   NumVec getRow(int r) const;
@@ -55,9 +54,8 @@ class TriDiag {
 };
 
 TriDiag operator*(double a, const TriDiag &B); // a*B#
-std::ostream &operator<<(std::ostream &os, const TriDiag& A);
+std::ostream &operator<<(std::ostream &os, const TriDiag &A);
 
 NumVec solveTriDiagMatrix(const TriDiag &A, const NumVec &d);
-
 
 #endif //CS28515PROJ1_TRIDIAG_H

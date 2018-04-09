@@ -8,10 +8,12 @@
 #include "numvec.h"
 #include "tridiag.h"
 
-TriDiag generateStiffnessMatrix(std::function<double(double)> f, int N);
-TriDiag generateMassMatrix(std::function<double(double)> f, int N);
+TriDiag generateStiffnessMatrix(std::function<double(double)> k, int N, double mesh_width);
+double stiffnessMatrixEntry(std::function<double(double)> k, int phi_i, int phi_j, double mesh_width);
 
-double midpointmethod(std::function<double(double)> f, double x_i, double x_n);
+TriDiag generateMassMatrix(std::function<double(double)> d, int N, double mesh_width);
+double massMatrixEntry(std::function<double(double)> d, int phi_i, int phi_j, double mesh_width);
+
 
 
 #endif //CS28515PROJ1_PDESOLVER_H
