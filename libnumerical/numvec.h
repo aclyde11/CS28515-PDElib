@@ -6,8 +6,9 @@
 #define CS28515PROJ1_NUMVEC_H
 
 #include <cstdlib>
+#include <functional>
 #include <iostream>
-#include<vector>
+#include <vector>
 
 #include "utility.h"
 
