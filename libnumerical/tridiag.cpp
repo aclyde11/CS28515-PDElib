@@ -116,12 +116,43 @@ NumVec TriDiag::operator*(const NumVec &v) const{
   double d;
   for (int i = 0; i < dim; i++) {
     d = 0.0;
-    for (int j = 0; j < dim; j++) {
-      d += this->operator()(i,j) * v[j];
+    for (int j = i-1; j < dim && j <= i+1; j++) {
+      if(j >= 0)
+        d += this->operator()(i,j) * v[j];
     }
     y[i] = d;
   }
   return y;
+}
+
+//TODO: Make better for tridiag, not general multplciation;
+TriDiag TriDiag::operator*(const TriDiag& B) const{
+  if (dim != B.dim)
+    error("TriDiag * TriDiag: bad sizes");
+
+  TriDiag P(dim);
+  double d = 0;
+  for(int i = 0; i < dim; i++) {
+    for(int j = i-1; j < dim && j <= i+1; j++) {
+      if (j >= 0)
+        P(i,j) = (this->getRow(i) , B.getCol(j)); //NumVec inner product
+    }
+  }
+  return P;
+}
+
+NumVec TriDiag::getRow(int r) const {
+  NumVec row(dim);
+  for(int i = 0; i < dim; i++)
+    row[i] = this->operator()(r,i);
+  return row;
+}
+
+NumVec TriDiag::getCol(int c) const {
+  NumVec col(dim);
+  for(int i = 0; i < dim; i++)
+    col[i] = this->operator()(i,c);
+  return col;
 }
 
 TriDiag TriDiag::operator+(const TriDiag &B) const{

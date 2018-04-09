@@ -20,23 +20,33 @@ class TriDiag {
   NumVec d;
   NumVec b;
 
+  //Constructors
   TriDiag();
   TriDiag(int n);
   TriDiag(int n, double p);
   TriDiag(const TriDiag &A);
 
+  void randomize();
+  void randomize(int start, int end);
+  void randomizeReals(double start, double end);
+
+  //Operators
   double &operator()(int i, int j);
   double operator()(int i, int j) const;
   bool operator==(const TriDiag &B) const;
   TriDiag operator+(const TriDiag &B) const; // A+B
   NumVec operator*(const NumVec &v) const;
+  TriDiag operator*(const TriDiag& B) const;
   TriDiag operator-(const TriDiag &B) const;
   void map(std::function<double(double)> func);
 
+
+  //Getters
+  NumVec getRow(int r) const;
+  NumVec getCol(int c) const;
+
+  //Functions on Matricies
   double det();
-  void randomize();
-  void randomize(int start, int end);
-  void randomizeReals(double start, double end);
 
  private:
   double det_f(int i);
