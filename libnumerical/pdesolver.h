@@ -18,7 +18,13 @@ double stiffnessMatrixEntry(std::function<double(double)> k, int phi_i, int phi_
 TriDiag generateMassMatrix(std::function<double(double)> d, int N, double mesh_width);
 double massMatrixEntry(std::function<double(double)> d, int phi_i, int phi_j, double mesh_width);
 
-void solveHeatEquation1d(double x_0, double x_nx, int nx, int nt, double tmax, double alpha);
+void solveHeatEquation1d(double x_0,
+                         double x_nx,
+                         int nx,
+                         int nt,
+                         double tmax,
+                         double alpha,
+                         std::function<double(double)> init);
 void writeParams(std::string name, std::vector<std::string> params);
 void writeUpdateStep(std::string name, NumVec a);
 

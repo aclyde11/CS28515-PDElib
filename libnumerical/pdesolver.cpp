@@ -53,10 +53,16 @@ double massMatrixEntry(std::function<double(double)> d, int phi_i, int phi_j, do
   return phi_i == phi_j ? 2.0 : -1.0; // \int_{x_0}^{x_N} d(x) \phi_i \phi_j dx
 }
 
-void solveHeatEquation1d(double x_0, double x_nx, int nx, int nt, double tmax, double alpha) {
+void solveHeatEquation1d(double x_0,
+                         double x_nx,
+                         int nx,
+                         int nt,
+                         double tmax,
+                         double alpha,
+                         std::function<double(double)> init) {
   double L = x_nx - x_0;
-  double dx = ((double) L) / (nx - 1);
-  double dt = ((double) tmax) / (nt - 1);
+  double dx = L / (nx - 1);
+  double dt = tmax / (nt - 1);
   NumVec actual(nx);
 
   std::vector<std::string> params;
@@ -81,15 +87,18 @@ void solveHeatEquation1d(double x_0, double x_nx, int nx, int nt, double tmax, d
   for (int i = 0; i < nx - 2; i++) { //below
     A(i + 1, i) = -1 * alpha / (dx * dx);
   }
-  //std::cout<< A;
 
   NumVec U(nx);
   NumVec UOld(nx);
-  for (int i = 0; i < nx - 1; i++)
-    U[i] = sin(PI * i * dx / L);
-  U[dx - 1] = 0;
+
+  //init conditions
+  for (int i = 1; i < nx - 1; i++) {
+    U[i] = init(i * dx);
+    std::cout << i * dx << std::endl;
+  }
+  U[nx - 1] = 0;
   U[0] = 0;
-  std::cout << U;
+
   double t = 0;
   for (int m = 1; m < nt; m++) {
     UOld = U;
@@ -102,8 +111,6 @@ void solveHeatEquation1d(double x_0, double x_nx, int nx, int nt, double tmax, d
     writeUpdateStep("test.txt", U);
   }
   std::cout << "error x= " << L2norm(actual - U) << std::endl;
-  std::cout << U;
-  std::cout << t;
 }
 
 void writeParams(std::string name, std::vector<std::string> params) {
