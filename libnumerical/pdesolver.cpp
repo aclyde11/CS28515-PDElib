@@ -6,6 +6,7 @@
 
 #define PI 3.1415926535
 
+
 /*
  * Generate Stiffness Matrix with linear piecewise functions
  */
@@ -51,9 +52,7 @@ TriDiag generateMassMatrix(std::function<double(double)> d, int N, double mesh_w
 double massMatrixEntry(std::function<double(double)> d, int phi_i, int phi_j, double mesh_width) {
   return phi_i == phi_j ? 2.0 : -1.0; // \int_{x_0}^{x_N} d(x) \phi_i \phi_j dx
 }
-/*
- * Solve U_t = alpha U_xx
- */
+
 void solveHeatEquation1d(double x_0,
                          double x_nx,
                          int nx,
@@ -93,26 +92,23 @@ void solveHeatEquation1d(double x_0,
   NumVec actual(nx);
 
   //init conditions
-  for (int i = 1; i < nx - 1; i++) {
+  for (int i = 1; i < nx - 1; i++)
     U[i] = init(i * dx);
-    std::cout << i * dx << std::endl;
-  }
   U[nx - 1] = 0;
   U[0] = 0;
 
-  //Iteration
   double t = 0;
   for (int m = 1; m < nt; m++) {
     UOld = U;
+    UOld = (1 / dt) * UOld;
     t = t + dt;
     U = solveTriDiagMatrix(A, UOld);
-    UOld = (1 / dt) * UOld;
     for (int i = 1; i < nx - 1; i++) {
       actual[i] = sin(PI * i * dx / L) * exp(-1 * alpha * PI * PI * t / L);
     }
     writeUpdateStep("test.txt", U);
   }
-  std::cout << "error x = " << L2norm(actual - U) << std::endl;
+  std::cout << "error x= " << L2norm(actual - U) << std::endl;
 }
 
 void writeParams(std::string name, std::vector<std::string> params) {

@@ -67,7 +67,7 @@ int main() {
   double x_0 = 0;
   double x_nx = 1;
   double L = (x_nx - x_0);
-  int nx = 100;
+  int nx = 5;
   int nt = 1000;
   double tmax = 1;
   double alpha = 0.1;

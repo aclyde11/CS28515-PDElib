@@ -33,7 +33,7 @@ test = []
 t = tmax
 for i in x:
     test.append(func(i, t, alpha))
-plt.plot(x, matrix[:, -1], label="approx")
-plt.plot(x, test, label="actual")
+plt.plot(x, matrix[:, -1], label="approx", linewidth=2)
+plt.plot(x, test, '--', label="actual", linewidth=2)
 plt.legend()
 plt.show()
