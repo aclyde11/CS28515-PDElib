@@ -41,7 +41,9 @@ double operator,(const NumVec& A, const NumVec& B) { // (A,B)
 
 std::ostream& operator<<(std::ostream& os, const NumVec& A) {
    for(int i=0; i<A.size(); i++){
-     os << A[i] << "\t";
+     os << A[i];
+     if (i != A.size() - 1)
+       os << "\t";
    }
  os << "\n";
  return os;
@@ -65,4 +67,11 @@ NumVec randomRealVector(int length, double start, double end) {
   NumVec r(length);
   generate(r.begin(), r.end(), gen);
   return r;
+}
+
+double L2norm(NumVec a) {
+  double d = 0;
+  for (int i = 0; i < a.size(); i++)
+    d += a[i] * a[i];
+  return d;
 }
