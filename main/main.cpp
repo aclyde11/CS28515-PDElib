@@ -72,7 +72,7 @@ int main() {
   double tmax = 1;
   double alpha = 0.1;
   std::function<double(double)> init;
-  init = [alpha, L](double x) -> double {
+  init = [alpha, L](double x) -> double { //TODO: use alpha or not?
     return sin(PI * x / L);
   };
   solveHeatEquation1d(x_0, x_nx, nx, nt, tmax, alpha, init);
