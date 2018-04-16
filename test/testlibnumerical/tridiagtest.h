@@ -15,4 +15,12 @@ class TriDiagTest : public ::testing::Test {
   TriDiag testMatrix;
 };
 
+class BackwardsDifferenceTest : public ::testing::Test {
+ public:
+  TriDiag m1;
+  TriDiag m2;
+  TriDiag result;
+  TriDiag testMatrix;
+};
+
 #endif

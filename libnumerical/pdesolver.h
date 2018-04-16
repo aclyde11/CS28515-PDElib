@@ -25,6 +25,15 @@ void solveHeatEquation1d(double x_0,
                          double tmax,
                          double alpha,
                          std::function<double(double)> init);
+void solveHeatEquation1dStepDoubling(double x_0,
+                                     double x_nx,
+                                     int nx,
+                                     int nt,
+                                     double tmax,
+                                     double alpha,
+                                     std::function<double(double)> init);
+
+
 void writeParams(std::string name, std::vector<std::string> params);
 void writeUpdateStep(std::string name, NumVec a);
 

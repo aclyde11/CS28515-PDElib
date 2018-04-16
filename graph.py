@@ -33,7 +33,15 @@ test = []
 t = tmax
 for i in x:
     test.append(func(i, t, alpha))
-plt.plot(x, matrix[:, -1], label="approx", linewidth=2)
-plt.plot(x, test, '--', label="actual", linewidth=2)
+x_big = np.linspace(0, L, 10000)
+squarer = lambda i: func(i, t, alpha)
+vfunc = np.vectorize(squarer)
+actual = vfunc(x_big)
+
+error = np.linalg.norm(np.abs(matrix[:, -1] - test))
+plt.plot(x, matrix[:, -1], label="pde solver output", linewidth=2)
+plt.plot(x_big, actual, label="actual_func", linewidth=2)
+plt.plot(x, test, '--', label="calculated on mesh", linewidth=2)
+plt.title("Error = " + str(error))
 plt.legend()
 plt.show()

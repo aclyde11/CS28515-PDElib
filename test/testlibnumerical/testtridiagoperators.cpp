@@ -30,9 +30,9 @@ TEST_F(TriDiagTest, MatrixNotEqualVal) {
 }
 
 TEST_F(TriDiagTest, MatrixAdd) {
-  m1 = TriDiag(3, 1);
-  m2 = TriDiag(3, 1);
-  result = TriDiag(3,2);
+  m1 = TriDiag(100, 1);
+  m2 = TriDiag(100, 1);
+  result = TriDiag(100, 2);
   EXPECT_TRUE((m1+m2) == result);
 }
 

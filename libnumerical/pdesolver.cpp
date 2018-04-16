@@ -111,6 +111,65 @@ void solveHeatEquation1d(double x_0,
   std::cout << "error x= " << L2norm(actual - U) << std::endl;
 }
 
+void solveHeatEquation1dStepDoubling(double x_0,
+                                     double x_nx,
+                                     int nx,
+                                     int nt,
+                                     double tmax,
+                                     double alpha,
+                                     std::function<double(double)> init) {
+  double L = x_nx - x_0;
+  double dx = L / (nx - 1);
+  double dt = tmax / (nt - 1);
+  double acc = pow(10, -3);
+
+  std::vector<std::string> params;
+  params.push_back(std::to_string(L));
+  params.push_back(std::to_string(nx));
+  params.push_back(std::to_string(dx));
+  params.push_back(std::to_string(tmax));
+  params.push_back(std::to_string(nt));
+  params.push_back(std::to_string(dt));
+  params.push_back(std::to_string(alpha));
+  writeParams("test.txt", params);
+
+  TriDiag A(nx);
+  for (int i = 1; i < nx - 1; i++) { //diag
+    A(i, i) = (1 / dt) + (2 * alpha / (dx * dx));
+  }
+  A(0, 0) = 1;
+  A(nx - 1, nx - 1) = 1;
+  for (int i = 1; i < nx - 1; i++) { //above
+    A(i, i + 1) = -1 * alpha / (dx * dx);
+  }
+  for (int i = 0; i < nx - 2; i++) { //below
+    A(i + 1, i) = -1 * alpha / (dx * dx);
+  }
+
+  NumVec U(nx);
+  NumVec UOld(nx);
+  NumVec actual(nx);
+
+  //init conditions
+  for (int i = 1; i < nx - 1; i++)
+    U[i] = init(i * dx);
+  U[nx - 1] = 0;
+  U[0] = 0;
+
+  double t = 0;
+  for (int m = 1; m < nt; m++) {
+    UOld = U;
+    UOld = (1 / dt) * UOld;
+    t = t + dt;
+    U = solveTriDiagMatrix(A, UOld);
+    for (int i = 1; i < nx - 1; -i++) {
+      actual[i] = sin(PI * i * dx / L) * exp(-1 * alpha * PI * PI * t / L);
+    }
+    writeUpdateStep("test.txt", U);
+  }
+  std::cout << "error x= " << L2norm(actual - U) << std::endl;
+}
+
 void writeParams(std::string name, std::vector<std::string> params) {
   std::ofstream ofs(name);
 
