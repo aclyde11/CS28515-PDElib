@@ -214,6 +214,5 @@ std::ostream &operator<<(std::ostream &os, const TriDiag &A) {
     }
     std::cout << std::endl;
   }
-  os << "\n";
   return os;
 }

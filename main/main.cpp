@@ -1,6 +1,6 @@
 #include <iostream>
 #include "tridiag.h"
-#include "pdesolver.h"
+#include "parabolicsolver.h"
 #include <algorithm>
 #include <cstdlib>
 #include <iostream>
@@ -13,24 +13,36 @@
 
 #define PI 3.141592653
 
-
 int main() {
+  std::function<double(double)> f = [](double x) { return 0; };
+  std::function<double(double)> one = [](double x) { return 1; };
+  std::function<double(double)> zero = [](double x) { return 0; };
+  std::function<double(double)> negOne = [](double x) { return -1; };
+  std::function<double(double)> id = [](double x) { return x; };
+
+  // c(x)u_t - k(x)u_xx + f(x,u)=0
+  /*
+  TriDiag M = generateMassMatrixMidpoint(zero, 5, 0.25, 0); //c(x)
+  std::cout << "mass: " << std::endl << M << std::endl;
+
+  TriDiag S = generateStiffnessMatrixMidpoint(one, 5, 0.25, 0); //k(x)
+  std::cout << "stiff: " << std::endl << S << std::endl;
+  */
+
   double x_0 = 0;
   double x_nx = 1;
   double L = (x_nx - x_0);
-  int nx = 15;
-  int nt = 10000;
-  double tmax = 1;
-  double alpha = 0.1;
+  int nx = 5;
+  int nt = 10;
+  double tmax = 0.01;
+
   std::function<double(double)> init;
-  init = [L](double x) -> double { //TODO: use alpha or not?
-    return sin(PI * x / L);
+  init = [](double x) -> double {
+    return x;
   };
 
-  std::clock_t start;
-  start = std::clock();
+  //k, c
+  solveMassStiff(one, zero, x_0, x_nx, nx, nt, tmax, init);
 
-  solveHeatEquation1d(x_0, x_nx, nx, nt, tmax, alpha, init);
-  std::cout << "Time: " << (std::clock() - start) / (double) (CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
   return 0;
 }

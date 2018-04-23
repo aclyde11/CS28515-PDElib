@@ -2,55 +2,31 @@
 // Created by Austin Clyde on 4/6/18.
 //
 
-#include "pdesolver.h"
+#include "parabolicsolver.h"
 
-#define PI 3.1415926535
+#define PI 3.141592653589793238462
 
-
-/*
- * Generate Stiffness Matrix with linear piecewise functions
- */
-TriDiag generateStiffnessMatrix(std::function<double(double)> k, int N, double mesh_width) {
+TriDiag generateStiffnessMatrixMidpoint(std::function<double(double)> k, int N, double dx, double x_0) {
   TriDiag S(N);
 
-  for (int i = 0; i < N; i++) {
-    for (int j = i - 1; j < N && j <= i + 1; j++) {
-      if (j >= 0) {
-        S(i, j) = stiffnessMatrixEntry(k, i, j, mesh_width);
-      }
-    }
+  for (int row = 0; row < N - 1; row++) {
+    S(row, row) += k(x_0 + dx * row + dx / 2) / dx;
+    S(row, row + 1) = -1 * k(x_0 + dx * row + dx / 2) / dx;
+    S(row + 1, row) = -1 * k(x_0 + dx * row + dx / 2) / dx;
+    S(row + 1, row + 1) = k(x_0 + dx * row + dx / 2) / dx;
   }
-
   return S;
 }
 
-/*
- * Uniform mesh, 1d case
- * s_{ij} = \int_{x_0}^{x_N} k(x) \phi_i' \phi_j' dx
- */
-double stiffnessMatrixEntry(std::function<double(double)> k, int phi_i, int phi_j, double mesh_width) {
-  return phi_i == phi_j ? 1.0 / (2.0 * mesh_width) : -1.0 / mesh_width;
-}
-
-TriDiag generateMassMatrix(std::function<double(double)> d, int N, double mesh_width) {
+TriDiag generateMassMatrixMidpoint(std::function<double(double)> c, int N, double dx, double x_0) {
   TriDiag M(N);
-
-  for (int i = 0; i < N; i++) {
-    for (int j = i - 1; j < N && j <= i + 1; j++) {
-      if (j >= 0) {
-        M(i, j) = massMatrixEntry(d, i, j, mesh_width);
-      }
-    }
+  for (int row = 0; row < N - 1; row++) {
+    M(row, row) += dx * 0.25 * c(x_0 + dx * row + dx / 2);
+    M(row, row + 1) = dx * 0.25 * c(x_0 + dx * row + dx / 2);
+    M(row + 1, row) = dx * 0.25 * c(x_0 + dx * row + dx / 2);
+    M(row + 1, row + 1) += dx * 0.25 * c(x_0 + dx * row + dx / 2);
   }
-
   return M;
-}
-
-/* TODO:
- * Generate Mass Matrix with linear piecewise functions
- */
-double massMatrixEntry(std::function<double(double)> d, int phi_i, int phi_j, double mesh_width) {
-  return phi_i == phi_j ? 2.0 : -1.0; // \int_{x_0}^{x_N} d(x) \phi_i \phi_j dx
 }
 
 void solveHeatEquation1d(double x_0,
@@ -111,6 +87,56 @@ void solveHeatEquation1d(double x_0,
   std::cout << "error x= " << L2norm(actual - U) << std::endl;
 }
 
+void solveMassStiff(std::function<double(double)> k, std::function<double(double)> c, double x_0,
+                    double x_nx,
+                    int nx,
+                    int nt,
+                    double tmax,
+                    std::function<double(double)> init) {
+  double L = x_nx - x_0;
+  double dx = L / (nx - 1);
+  double dt = tmax / (nt);
+  std::cout << "L = " << L << " nx = " << nx << " dx = " << dx << " dt = " << dt << std::endl;
+  NumVec U(nx);
+  NumVec UOld(nx);
+
+  //init conditions
+  for (int i = 0; i < nx; i++)
+    U[i] = init(i * dx);
+
+  std::cout << "initial vector for  U: " << U << std::endl;
+
+  TriDiag M = generateMassMatrixMidpoint(c, nx, dx, x_0);
+  TriDiag S = generateStiffnessMatrixMidpoint(k, nx, dx, x_0);
+  std::cout << "Mass: \n" << M << "Stiff: \n" << S << std::endl;
+
+  double t = 0;
+  NumVec dU(nx);
+  TriDiag LH = (1.0 / dt) * M + S;
+
+  //Boundary Conditions
+  LH(0, 0) = 1;
+  LH(0, 1) = 0;
+  LH(nx - 1, nx - 1) = 1;
+  LH(nx - 1, nx - 2) = 0;
+
+  std::cout << "starting du solving...\n";
+
+  for (int m = 1; m < nt; m++) {
+    t += dt;
+    std::cout << "t = " << t << std::endl;
+    std::cout << "left side of equation\n" << LH;
+    std::cout << "right side of equation: " << ((-1 * S) * U);
+
+    dU = solveTriDiagMatrix(LH, -1 * S * U); // + F
+    U = U + dU;
+
+    std::cout << "dU step " << m << ": " << dU;
+    std::cout << "U step " << m << ": " << U << std::endl << std::endl;
+    writeUpdateStep("test.txt", U);
+  }
+}
+
 void solveHeatEquation1dStepDoubling(double x_0,
                                      double x_nx,
                                      int nx,
@@ -155,19 +181,32 @@ void solveHeatEquation1dStepDoubling(double x_0,
     U[i] = init(i * dx);
   U[nx - 1] = 0;
   U[0] = 0;
-
+  std::cout << A;
   double t = 0;
   for (int m = 1; m < nt; m++) {
     UOld = U;
     UOld = (1 / dt) * UOld;
     t = t + dt;
     U = solveTriDiagMatrix(A, UOld);
-    for (int i = 1; i < nx - 1; -i++) {
+    for (int i = 1; i < nx - 1; i++) {
       actual[i] = sin(PI * i * dx / L) * exp(-1 * alpha * PI * PI * t / L);
     }
     writeUpdateStep("test.txt", U);
   }
+  std::cout << "old: " << U;
   std::cout << "error x= " << L2norm(actual - U) << std::endl;
+}
+
+double simpson_integration(std::function<double(double)> f, double a, double b, int n_intervals) {
+  double h = (b - a) / n_intervals;
+  double s = f(a) + f(b);
+
+  for (int i = 0; i < n_intervals; i += 2)
+    s += 4 * f(a + i * h);
+  for (int i = 1; i < n_intervals - 1; i += 2)
+    s += 2 * f(a + i * h);
+
+  return s * h / 3;
 }
 
 void writeParams(std::string name, std::vector<std::string> params) {

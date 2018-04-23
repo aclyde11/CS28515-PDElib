@@ -7,16 +7,20 @@
 
 #include "numvec.h"
 #include "tridiag.h"
-#include <math.h>
+#include <cmath>
 #include <fstream>
 #include <string>
 #include <iterator>
 
-TriDiag generateStiffnessMatrix(std::function<double(double)> k, int N, double mesh_width);
-double stiffnessMatrixEntry(std::function<double(double)> k, int phi_i, int phi_j, double mesh_width);
+TriDiag generateStiffnessMatrixMidpoint(std::function<double(double)> k, int N, double dx, double x_0);
+TriDiag generateMassMatrixMidpoint(std::function<double(double)> d, int N, double dx, double x_0);
 
-TriDiag generateMassMatrix(std::function<double(double)> d, int N, double mesh_width);
-double massMatrixEntry(std::function<double(double)> d, int phi_i, int phi_j, double mesh_width);
+void solveMassStiff(std::function<double(double)> k, std::function<double(double)> c, double x_0,
+                    double x_nx,
+                    int nx,
+                    int nt,
+                    double tmax,
+                    std::function<double(double)> init);
 
 void solveHeatEquation1d(double x_0,
                          double x_nx,
@@ -33,7 +37,7 @@ void solveHeatEquation1dStepDoubling(double x_0,
                                      double alpha,
                                      std::function<double(double)> init);
 
-
+double simpson_integration(std::function<double(double)> f, double a, double b, int n_intervals);
 void writeParams(std::string name, std::vector<std::string> params);
 void writeUpdateStep(std::string name, NumVec a);
 
