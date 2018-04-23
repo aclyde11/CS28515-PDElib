@@ -39,6 +39,7 @@ vfunc = np.vectorize(squarer)
 actual = vfunc(x_big)
 
 error = np.linalg.norm(np.abs(matrix[:, -1] - test))
+print matrix.shape
 plt.plot(x, matrix[:, -1], label="pde solver output", linewidth=2)
 plt.plot(x_big, actual, label="actual_func", linewidth=2)
 plt.plot(x, test, '--', label="calculated on mesh", linewidth=2)

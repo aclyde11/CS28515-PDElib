@@ -4,8 +4,6 @@
 
 #include "parabolicsolver.h"
 
-#define PI 3.141592653589793238462
-
 TriDiag generateStiffnessMatrixMidpoint(std::function<double(double)> k, int N, double dx, double x_0) {
   TriDiag S(N);
 
@@ -79,9 +77,6 @@ void solveHeatEquation1d(double x_0,
     UOld = (1 / dt) * UOld;
     t = t + dt;
     U = solveTriDiagMatrix(A, UOld);
-    for (int i = 1; i < nx - 1; i++) {
-      actual[i] = sin(PI * i * dx / L) * exp(-1 * alpha * PI * PI * t / L);
-    }
     writeUpdateStep("test.txt", U);
   }
   std::cout << "error x= " << L2norm(actual - U) << std::endl;
@@ -96,24 +91,33 @@ void solveMassStiff(std::function<double(double)> k, std::function<double(double
   double L = x_nx - x_0;
   double dx = L / (nx - 1);
   double dt = tmax / (nt);
-  std::cout << "L = " << L << " nx = " << nx << " dx = " << dx << " dt = " << dt << std::endl;
+  double t = 0;
+
+  TriDiag M = generateMassMatrixMidpoint(c, nx, dx, x_0);
+  TriDiag S = generateStiffnessMatrixMidpoint(k, nx, dx, x_0);
+  TriDiag DF;
+  NumVec F;
   NumVec U(nx);
-  NumVec UOld(nx);
+  NumVec dU(nx);
 
   //init conditions
   for (int i = 0; i < nx; i++)
     U[i] = init(i * dx);
 
+  std::vector<std::string> params;
+  params.push_back(std::to_string(L));
+  params.push_back(std::to_string(nx));
+  params.push_back(std::to_string(dx));
+  params.push_back(std::to_string(tmax));
+  params.push_back(std::to_string(nt));
+  params.push_back(std::to_string(dt));
+  params.push_back(std::to_string(k(1.0)));
+  writeParams("test.txt", params);
+  std::cout << "L = " << L << " nx = " << nx << " dx = " << dx << " dt = " << dt << std::endl;
   std::cout << "initial vector for  U: " << U << std::endl;
-
-  TriDiag M = generateMassMatrixMidpoint(c, nx, dx, x_0);
-  TriDiag S = generateStiffnessMatrixMidpoint(k, nx, dx, x_0);
   std::cout << "Mass: \n" << M << "Stiff: \n" << S << std::endl;
 
-  double t = 0;
-  NumVec dU(nx);
   TriDiag LH = (1.0 / dt) * M + S;
-
   //Boundary Conditions
   LH(0, 0) = 1;
   LH(0, 1) = 0;
@@ -121,20 +125,44 @@ void solveMassStiff(std::function<double(double)> k, std::function<double(double
   LH(nx - 1, nx - 2) = 0;
 
   std::cout << "starting du solving...\n";
-
-  for (int m = 1; m < nt; m++) {
+  NumVec RH(nx);
+  for (int m = 1; m <= nt; m++) {
+    writeUpdateStep("test.txt", U);
     t += dt;
+
+    F = linearizeF(U, m * dx, dx, t, dt);
+    DF = linearizeDF(U, F, m * dx, dx, t, dt);
+    LH = (1.0 / dt) * M + S - DF;
+    //LH(0, 0) = 1;
+    //LH(0, 1) = 0;
+    //LH(nx - 1, nx - 1) = 1;
+    //LH(nx - 1, nx - 2) = 0;
+
+    RH = ((-1 * S) * U + F);
+    RH[0] += k(0) * dU[0];
+    RH[nx - 1] += -1 * k(L) * dU[nx - 1];
     std::cout << "t = " << t << std::endl;
     std::cout << "left side of equation\n" << LH;
-    std::cout << "right side of equation: " << ((-1 * S) * U);
+    std::cout << "right side of equation: " << RH;
 
-    dU = solveTriDiagMatrix(LH, -1 * S * U); // + F
+    dU = solveTriDiagMatrix(LH, RH);
     U = U + dU;
 
     std::cout << "dU step " << m << ": " << dU;
     std::cout << "U step " << m << ": " << U << std::endl << std::endl;
-    writeUpdateStep("test.txt", U);
   }
+}
+
+NumVec linearizeF(NumVec U, double x_i, double dx, double t_i, double dt) {
+  NumVec F(U.size());
+
+  return F;
+}
+
+TriDiag linearizeDF(NumVec U, NumVec F, double x_i, double dx, double t_i, double dt) {
+  TriDiag DF(U.size());
+
+  return DF;
 }
 
 void solveHeatEquation1dStepDoubling(double x_0,
@@ -188,9 +216,6 @@ void solveHeatEquation1dStepDoubling(double x_0,
     UOld = (1 / dt) * UOld;
     t = t + dt;
     U = solveTriDiagMatrix(A, UOld);
-    for (int i = 1; i < nx - 1; i++) {
-      actual[i] = sin(PI * i * dx / L) * exp(-1 * alpha * PI * PI * t / L);
-    }
     writeUpdateStep("test.txt", U);
   }
   std::cout << "old: " << U;

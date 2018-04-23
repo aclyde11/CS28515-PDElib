@@ -32,17 +32,22 @@ int main() {
   double x_0 = 0;
   double x_nx = 1;
   double L = (x_nx - x_0);
-  int nx = 5;
-  int nt = 10;
-  double tmax = 0.01;
+  int nx = 15;
+  int nt = 1000;
+  double tmax = 0.5;
 
   std::function<double(double)> init;
-  init = [](double x) -> double {
-    return x;
+
+  init = [L](double x) -> double {
+    return sin(PI * x / L);
   };
 
+  /*init = [](double x) -> double {
+    return 1;
+  };*/
+
   //k, c
-  solveMassStiff(one, zero, x_0, x_nx, nx, nt, tmax, init);
+  solveMassStiff(one, one, x_0, x_nx, nx, nt, tmax, init);
 
   return 0;
 }
