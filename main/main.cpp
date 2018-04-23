@@ -32,9 +32,9 @@ int main() {
   double x_0 = 0;
   double x_nx = 1;
   double L = (x_nx - x_0);
-  int nx = 15;
+  int nx = 25;
   int nt = 1000;
-  double tmax = 0.5;
+  double tmax = 1;
 
   std::function<double(double)> init;
 
@@ -47,7 +47,11 @@ int main() {
   };*/
 
   //k, c
-  solveMassStiff(one, one, x_0, x_nx, nx, nt, tmax, init);
 
+  std::clock_t start;
+
+  start = std::clock();
+  solveMassStiff(one, one, x_0, x_nx, nx, nt, tmax, init);
+  std::cout << "Time: " << (std::clock() - start) / (double) (CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
   return 0;
 }

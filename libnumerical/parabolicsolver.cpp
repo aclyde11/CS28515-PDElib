@@ -82,6 +82,7 @@ void solveHeatEquation1d(double x_0,
   std::cout << "error x= " << L2norm(actual - U) << std::endl;
 }
 
+
 void solveMassStiff(std::function<double(double)> k, std::function<double(double)> c, double x_0,
                     double x_nx,
                     int nx,
@@ -92,7 +93,8 @@ void solveMassStiff(std::function<double(double)> k, std::function<double(double
   double dx = L / (nx - 1);
   double dt = tmax / (nt);
   double t = 0;
-
+  bool debug = false;
+  bool dirch = false;
   TriDiag M = generateMassMatrixMidpoint(c, nx, dx, x_0);
   TriDiag S = generateStiffnessMatrixMidpoint(k, nx, dx, x_0);
   TriDiag DF;
@@ -113,18 +115,14 @@ void solveMassStiff(std::function<double(double)> k, std::function<double(double
   params.push_back(std::to_string(dt));
   params.push_back(std::to_string(k(1.0)));
   writeParams("test.txt", params);
-  std::cout << "L = " << L << " nx = " << nx << " dx = " << dx << " dt = " << dt << std::endl;
-  std::cout << "initial vector for  U: " << U << std::endl;
-  std::cout << "Mass: \n" << M << "Stiff: \n" << S << std::endl;
 
+  if (debug) {
+    std::cout << "L = " << L << " nx = " << nx << " dx = " << dx << " dt = " << dt << std::endl;
+    std::cout << "initial vector for  U: " << U << std::endl;
+    std::cout << "Mass: \n" << M << "Stiff: \n" << S << std::endl;
+  }
   TriDiag LH = (1.0 / dt) * M + S;
-  //Boundary Conditions
-  LH(0, 0) = 1;
-  LH(0, 1) = 0;
-  LH(nx - 1, nx - 1) = 1;
-  LH(nx - 1, nx - 2) = 0;
 
-  std::cout << "starting du solving...\n";
   NumVec RH(nx);
   for (int m = 1; m <= nt; m++) {
     writeUpdateStep("test.txt", U);
@@ -133,24 +131,31 @@ void solveMassStiff(std::function<double(double)> k, std::function<double(double
     F = linearizeF(U, m * dx, dx, t, dt);
     DF = linearizeDF(U, F, m * dx, dx, t, dt);
     LH = (1.0 / dt) * M + S - DF;
-    //LH(0, 0) = 1;
-    //LH(0, 1) = 0;
-    //LH(nx - 1, nx - 1) = 1;
-    //LH(nx - 1, nx - 2) = 0;
-
     RH = ((-1 * S) * U + F);
-    RH[0] += k(0) * dU[0];
-    RH[nx - 1] += -1 * k(L) * dU[nx - 1];
-    std::cout << "t = " << t << std::endl;
-    std::cout << "left side of equation\n" << LH;
-    std::cout << "right side of equation: " << RH;
+
+    if (dirch) {
+      LH(0, 0) = 1;
+      LH(0, 1) = 0;
+      LH(nx - 1, nx - 1) = 1;
+      LH(nx - 1, nx - 2) = 0;
+      RH[0] = 0;
+      RH[nx - 1] = 0;
+    } else { // von
+      RH[0] += k(0) * dU[0];
+      RH[nx - 1] += -1 * k(L) * dU[nx - 1];
+    }
 
     dU = solveTriDiagMatrix(LH, RH);
     U = U + dU;
-
-    std::cout << "dU step " << m << ": " << dU;
-    std::cout << "U step " << m << ": " << U << std::endl << std::endl;
+    if (debug) {
+      std::cout << "t = " << t << std::endl;
+      std::cout << "left side of equation\n" << LH;
+      std::cout << "right side of equation: " << RH;
+      std::cout << "dU step " << m << ": " << dU;
+      std::cout << "U step " << m << ": " << U << std::endl << std::endl;
+    }
   }
+  std::cout << "U at t = " << t << ": " << U;
 }
 
 NumVec linearizeF(NumVec U, double x_i, double dx, double t_i, double dt) {
