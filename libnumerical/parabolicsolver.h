@@ -16,6 +16,23 @@ TriDiag generateStiffnessMatrixMidpoint(std::function<double(double)> k, int N, 
 TriDiag generateMassMatrixMidpoint(std::function<double(double)> d, int N, double dx, double x_0);
 TriDiag linearizeDF(NumVec U, NumVec F, double x_i, double dx, double t_i, double dt);
 NumVec linearizeF(NumVec U, double x_i, double dx, double t_i, double dt);
+
+NumVec step(std::function<double(double)> k, std::function<double(double)> c,
+    //  std::function<double(double, std::function<double(double, double)>)> F,
+            double t,
+            double x_0,
+            double x_nx,
+            double L,
+            double dx,
+            double dt,
+            int nx,
+            NumVec U, NumVec dU, bool debug, bool dirch);
+void solveMassStiffStepDouble(std::function<double(double)> k, std::function<double(double)> c, double x_0,
+                              double x_nx,
+                              int nx,
+                              int nt,
+                              double tmax,
+                              std::function<double(double)> init, bool debug, bool dirch);
 void solveMassStiff(std::function<double(double)> k, std::function<double(double)> c, double x_0,
                     double x_nx,
                     int nx,

@@ -82,6 +82,100 @@ void solveHeatEquation1d(double x_0,
   std::cout << "error x= " << L2norm(actual - U) << std::endl;
 }
 
+void solveMassStiffStepDouble(std::function<double(double)> k, std::function<double(double)> c, double x_0,
+                              double x_nx,
+                              int nx,
+                              int nt,
+                              double tmax,
+                              std::function<double(double)> init, bool debug, bool dirch) {
+  double L = x_nx - x_0;
+  double dx = L / (nx - 1);
+  double dt = tmax / (nt);
+  double t = 0;
+
+  NumVec U(nx);
+  NumVec dU(nx), dU_1(nx), dU_2(nx);
+
+  //init conditions
+  for (int i = 0; i < nx; i++)
+    U[i] = init(i * dx);
+
+  std::vector<std::string> params;
+  params.push_back(std::to_string(L));
+  params.push_back(std::to_string(nx));
+  params.push_back(std::to_string(dx));
+  params.push_back(std::to_string(tmax));
+  params.push_back(std::to_string(nt));
+  params.push_back(std::to_string(dt));
+  params.push_back(std::to_string(k(1.0)));
+  writeParams("test.txt", params);
+
+
+  NumVec RH(nx);
+  for (int m = 1; m <= nt; m++) {
+    dU_1 = step(k, c, m * dt, x_0, x_nx, L, dx, dt, nx, U, dU, debug, dirch);
+    dU_2 = step(k, c, m * dt, x_0, x_nx, L, dx, dt / 2, nx, U, dU, debug, dirch);
+    dU_2 = dU_2 + step(k, c, m * dt + dt / 2, x_0, x_nx, L, dx, dt / 2, nx, U, dU_2, debug, dirch);
+    U = U + dU_1;
+    writeUpdateStep("test.txt", U);
+    std::cout << "error " << L2norm(dU_1 - dU_2) << std::endl;
+  }
+  std::cout << "U at t = " << t << ": " << U;
+}
+
+NumVec step(std::function<double(double)> k, std::function<double(double)> c,
+    //  std::function<double(double, std::function<double(double, double)>)> F,
+            double t,
+            double x_0,
+            double x_nx,
+            double L,
+            double dx,
+            double dt,
+            int nx,
+            NumVec U, NumVec dU, bool debug, bool dirch) {
+
+  TriDiag DF, LH;
+  TriDiag M = generateMassMatrixMidpoint(c, nx, dx, x_0);
+  TriDiag S = generateStiffnessMatrixMidpoint(k, nx, dx, x_0);
+  NumVec F;
+  NumVec dU_1(nx), dU_2(nx), RH(nx);
+
+  if (debug) {
+    std::cout << "L = " << L << " nx = " << nx << " dx = " << dx << " dt = " << dt << std::endl;
+    std::cout << "initial vector for  U: " << U << std::endl;
+    std::cout << "Mass: \n" << M << "Stiff: \n" << S << std::endl;
+  }
+
+  t += dt;
+
+  F = linearizeF(U, dx, dx, t, dt);
+  DF = linearizeDF(U, F, dx, dx, t, dt);
+  LH = (1.0 / dt) * M + S - DF;
+  RH = ((-1 * S) * U + F);
+
+  if (dirch) {
+    LH(0, 0) = 1;
+    LH(0, 1) = 0;
+    LH(nx - 1, nx - 1) = 1;
+    LH(nx - 1, nx - 2) = 0;
+    RH[0] = 0;
+    RH[nx - 1] = 0;
+  } else { // von
+    RH[0] += k(0) * dU[0];
+    RH[nx - 1] += -1 * k(L) * dU[nx - 1];
+  }
+
+  dU_1 = solveTriDiagMatrix(LH, RH);
+
+  if (debug) {
+    std::cout << "t = " << t << std::endl;
+    std::cout << "left side of equation\n" << LH;
+    std::cout << "right side of equation: " << RH;
+    std::cout << "dU step " << t << ": " << dU;
+    std::cout << "U step " << t << ": " << U << std::endl << std::endl;
+  }
+  return dU_1;
+}
 
 void solveMassStiff(std::function<double(double)> k, std::function<double(double)> c, double x_0,
                     double x_nx,

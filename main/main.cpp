@@ -10,7 +10,8 @@
 #include <cmath>
 #include <ctime>
 #include <string>
-
+#include "LinearParabolicProblem.h"
+#include "simtime.h"
 #define PI 3.141592653
 
 int main() {
@@ -32,9 +33,9 @@ int main() {
   double x_0 = 0;
   double x_nx = 1;
   double L = (x_nx - x_0);
-  int nx = 25;
-  int nt = 1000;
-  double tmax = 1;
+  int nx = 15;
+  int nt = 100;
+  double tmax = 0.1;
 
   std::function<double(double)> init;
 
@@ -51,7 +52,17 @@ int main() {
   std::clock_t start;
 
   start = std::clock();
-  solveMassStiff(one, one, x_0, x_nx, nx, nt, tmax, init);
-  std::cout << "Time: " << (std::clock() - start) / (double) (CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+  solveMassStiffStepDouble(one, one, x_0, x_nx, nx, nt, tmax, init, true, true);
+  std::cout << "Time: " << (std::clock() - start) / (double) (CLOCKS_PER_SEC / 1000.0) << " ms" << std::endl;
+
+  std::cout << "\n\n\n\n" << "starting new type\n";
+
+  simTime tc;
+  LinearParabolicProblem pb("test2.txt", init, one, one, nx, 0, 1, tc, vonNeumann);
+
+  start = std::clock();
+  pb.run();
+  std::cout << "Time: " << (std::clock() - start) / (double) (CLOCKS_PER_SEC / 1000.0) << " ms" << std::endl;
+
   return 0;
 }

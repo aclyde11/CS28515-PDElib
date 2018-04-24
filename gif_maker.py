@@ -6,7 +6,7 @@ from matplotlib.animation import FuncAnimation
 
 pi = 3.14159265
 
-text_file = "/Users/austin/CLionProjects/CS28515Proj1/cmake-build-debug/main/test.txt"
+text_file = "/Users/austin/CLionProjects/CS28515Proj1/cmake-build-debug/main/test2.txt"
 with open(text_file, 'r') as fin:
     data = fin.read().splitlines(True)
     params = np.fromstring(data[0], sep='\t')
