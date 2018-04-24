@@ -45,13 +45,17 @@ void LinearParabolicProblem::run() {
     advance();
     std::cout << U;
   }
+  std::cout << timeControl;
 }
 
 void LinearParabolicProblem::advance() {
   double diff, newdt;
   NumVec dU_1, dU_2;
   int tries = 0;
+  timeControl.stepsSinceRejection = 0;
   do {
+    timeControl.stepsRejected += 1;
+    timeControl.stepsSinceRejection += 1;
     dU_1 = step(timeControl.time, timeControl.dt);
     dU_2 = step(timeControl.time, timeControl.dt / 2);
     dU_2 = dU_2 + step(timeControl.time + timeControl.dt / 2, timeControl.dt / 2);
@@ -67,10 +71,10 @@ void LinearParabolicProblem::advance() {
       timeControl.dt = (newdt < timeControl.dtmin) ? timeControl.dtmin : newdt;
     }
 
-    if (tries >= 20)
+    if (timeControl.stepsSinceRejection >= 20)
       error("OH NO!!! Dangnabbit");
-    tries++;
   } while (diff > timeControl.tol);
+  timeControl.stepsAccepted += 1;
   timeControl.time += timeControl.dt;
   dU = dU_1;
   U = U + dU;

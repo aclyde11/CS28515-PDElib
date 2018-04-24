@@ -33,9 +33,9 @@ int main() {
   double x_0 = 0;
   double x_nx = 1;
   double L = (x_nx - x_0);
-  int nx = 15;
-  int nt = 100;
-  double tmax = 0.1;
+  int nx = 250;
+  int nt = 1000;
+  double tmax = 1.0;
 
   std::function<double(double)> init;
 
@@ -52,17 +52,16 @@ int main() {
   std::clock_t start;
 
   start = std::clock();
-  solveMassStiffStepDouble(one, one, x_0, x_nx, nx, nt, tmax, init, true, true);
+  // solveMassStiffStepDouble(one, one, x_0, x_nx, nx, nt, tmax, init, false, true);
   std::cout << "Time: " << (std::clock() - start) / (double) (CLOCKS_PER_SEC / 1000.0) << " ms" << std::endl;
 
   std::cout << "\n\n\n\n" << "starting new type\n";
 
   simTime tc;
-  LinearParabolicProblem pb("test2.txt", init, one, one, nx, 0, 1, tc, vonNeumann);
+  LinearParabolicProblem pb("test2.txt", init, one, one, nx, 0, 1, tc, dirchlet);
 
   start = std::clock();
   pb.run();
   std::cout << "Time: " << (std::clock() - start) / (double) (CLOCKS_PER_SEC / 1000.0) << " ms" << std::endl;
-
   return 0;
 }
