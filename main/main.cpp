@@ -33,7 +33,7 @@ int main() {
   double x_0 = 0;
   double x_nx = 1;
   double L = (x_nx - x_0);
-  int nx = 250;
+  int nx = 15;
   int nt = 1000;
   double tmax = 1.0;
 
@@ -58,7 +58,7 @@ int main() {
   std::cout << "\n\n\n\n" << "starting new type\n";
 
   simTime tc;
-  LinearParabolicProblem pb("test2.txt", init, one, one, nx, 0, 1, tc, dirchlet);
+  LinearParabolicProblem pb("test2.txt", init, one, one, nx, 0, 1, tc, vonNeumann);
 
   start = std::clock();
   pb.run();

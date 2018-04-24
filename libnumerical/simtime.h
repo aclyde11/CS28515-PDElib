@@ -22,7 +22,7 @@ class simTime { // class for time step control
   int stepsAccepted;
   bool newSimulation;
   simTime() : time(0.0), dt(0.001), dtOld(0.001), tol(1.0e-3), agrow(1.25),
-              ashrink(1.0 / 1.25), dtmin(1.0e-6), dtmax(1.0), endTime(1.0),
+              ashrink(1.0 / 1.25), dtmin(1.0e-7), dtmax(1.0), endTime(1.0),
               stepsSinceRejection(0), stepsRejected(0), stepsAccepted(true), newSimulation(true) {}
   friend std::ostream &operator<<(std::ostream &os, const simTime &time1) {
     os << "time: " << time1.time << " dt: " << time1.dt << " dtOld: " << time1.dtOld << " tol: " << time1.tol

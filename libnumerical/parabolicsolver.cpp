@@ -77,7 +77,7 @@ void solveHeatEquation1d(double x_0,
     UOld = (1 / dt) * UOld;
     t = t + dt;
     U = solveTriDiagMatrix(A, UOld);
-    writeUpdateStep("test.txt", U);
+    writeUpdateStep("test.txt", U, t);
   }
   std::cout << "error x= " << L2norm(actual - U) << std::endl;
 }
@@ -117,7 +117,7 @@ void solveMassStiffStepDouble(std::function<double(double)> k, std::function<dou
     dU_2 = step(k, c, m * dt, x_0, x_nx, L, dx, dt / 2, nx, U, dU, debug, dirch);
     dU_2 = dU_2 + step(k, c, m * dt + dt / 2, x_0, x_nx, L, dx, dt / 2, nx, U, dU_2, debug, dirch);
     U = U + dU_1;
-    writeUpdateStep("test.txt", U);
+    writeUpdateStep("test.txt", U, t);
     std::cout << "error " << L2norm(dU_1 - dU_2) << std::endl;
   }
   std::cout << "U at t = " << t << ": " << U;
@@ -219,7 +219,7 @@ void solveMassStiff(std::function<double(double)> k, std::function<double(double
 
   NumVec RH(nx);
   for (int m = 1; m <= nt; m++) {
-    writeUpdateStep("test.txt", U);
+    writeUpdateStep("test.txt", U, t);
     t += dt;
 
     F = linearizeF(U, m * dx, dx, t, dt);
@@ -315,7 +315,7 @@ void solveHeatEquation1dStepDoubling(double x_0,
     UOld = (1 / dt) * UOld;
     t = t + dt;
     U = solveTriDiagMatrix(A, UOld);
-    writeUpdateStep("test.txt", U);
+    writeUpdateStep("test.txt", U, t);
   }
   std::cout << "old: " << U;
   std::cout << "error x= " << L2norm(actual - U) << std::endl;
@@ -349,13 +349,14 @@ void writeParams(std::string name, std::vector<std::string> params) {
   ofs.close();
 }
 
-void writeUpdateStep(std::string name, NumVec a) {
+void writeUpdateStep(std::string name, NumVec a, double t) {
   std::ofstream ofs(name, std::fstream::app);
 
   if (!ofs) {
     std::cout << "Error opening file for output" << std::endl;
     return;
   }
+  ofs << t << '\t';
   ofs << a;
   ofs.close();
 }

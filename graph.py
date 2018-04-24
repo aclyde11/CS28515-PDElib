@@ -20,6 +20,8 @@ dt = params[5]
 alpha = params[6]
 
 matrix = np.loadtxt(text_file + "tmp", usecols=range(int(nx))).transpose()
+times = matrix[0, :]
+matrix = np.delete(matrix, 0, 1)
 print matrix.shape
 print matrix[:, 1]
 

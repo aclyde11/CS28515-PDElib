@@ -57,6 +57,6 @@ void solveHeatEquation1dStepDoubling(double x_0,
 
 double simpson_integration(std::function<double(double)> f, double a, double b, int n_intervals);
 void writeParams(std::string name, std::vector<std::string> params);
-void writeUpdateStep(std::string name, NumVec a);
+void writeUpdateStep(std::string name, NumVec a, double t);
 
 #endif //CS28515PROJ1_PDESOLVER_H

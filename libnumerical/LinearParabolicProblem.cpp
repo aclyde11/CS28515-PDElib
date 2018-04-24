@@ -51,7 +51,6 @@ void LinearParabolicProblem::run() {
 void LinearParabolicProblem::advance() {
   double diff, newdt;
   NumVec dU_1, dU_2;
-  int tries = 0;
   timeControl.stepsSinceRejection = 0;
   do {
     timeControl.stepsRejected += 1;
@@ -71,14 +70,19 @@ void LinearParabolicProblem::advance() {
       timeControl.dt = (newdt < timeControl.dtmin) ? timeControl.dtmin : newdt;
     }
 
-    if (timeControl.stepsSinceRejection >= 20)
-      error("OH NO!!! Dangnabbit");
+    if (timeControl.stepsSinceRejection >= 50 && timeControl.dt == timeControl.dtmin) {
+      std::cout << ("WARNING! taking half step\n");
+      timeControl.dt = timeControl.dt / 2;
+      diff = timeControl.tol;
+      dU_1 = step(timeControl.time, timeControl.dt / 2);
+      dU_2 = dU_1;
+    }
   } while (diff > timeControl.tol);
   timeControl.stepsAccepted += 1;
   timeControl.time += timeControl.dt;
-  dU = dU_1;
+  dU = 0.5 * (dU_1 + dU_2);
   U = U + dU;
-  writeUpdateStep(file_name, U);
+  writeUpdateStep(file_name, U, timeControl.time);
 }
 
 NumVec LinearParabolicProblem::step(double t, double dt) {
