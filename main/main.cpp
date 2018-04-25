@@ -39,29 +39,39 @@ int main() {
 
   std::function<double(double)> init;
 
-  init = [L](double x) -> double {
-    return sin(PI * x / L);
+  std::function<double(double, NumVec)> zeroF = [](double x, NumVec U) {
+    return 0;
   };
 
-  /*init = [](double x) -> double {
-    return 1;
+  std::function<double(double, NumVec)> F = [](double x, NumVec U) {
+    double g = (0 <= x && x < 1) ? 1 : -3;
+    return (1 - x) * 3 * g;
+  };
+
+  /*init = [L](double x) -> double {
+    return sin(PI * x / L);
   };*/
+
+  init = [](double x) -> double {
+    return 0.1;
+  };
 
   //k, c
 
   std::clock_t start;
-
+  NumVec U(5);
   start = std::clock();
   // solveMassStiffStepDouble(one, one, x_0, x_nx, nx, nt, tmax, init, false, true);
   std::cout << "Time: " << (std::clock() - start) / (double) (CLOCKS_PER_SEC / 1000.0) << " ms" << std::endl;
 
+  std::cout << linearizeF(U, F, 0.25, 0.05, 0.001);
   std::cout << "\n\n\n\n" << "starting new type\n";
 
   simTime tc;
-  LinearParabolicProblem pb("test2.txt", init, one, one, nx, 0, 1, tc, vonNeumann);
+  LinearParabolicProblem pb("test2.txt", init, one, one, F, nx, 0, 1, tc, vonNeumann);
 
   start = std::clock();
   pb.run();
-  std::cout << "Time: " << (std::clock() - start) / (double) (CLOCKS_PER_SEC / 1000.0) << " ms" << std::endl;
+  std::cout << "\nTime: " << (std::clock() - start) / (double) (CLOCKS_PER_SEC / 1000.0) << " ms" << std::endl;
   return 0;
 }

@@ -19,6 +19,7 @@ class LinearParabolicProblem {
   NumVec U, dU;
   std::string file_name;
   std::function<double(double)> k, c;
+  std::function<double(double, NumVec)> Fux;
   int nx;
   double x_0, x_n, dx;
   simTime timeControl;
@@ -30,6 +31,7 @@ class LinearParabolicProblem {
                          const std::function<double(double)> &init,
                          const std::function<double(double)> &k,
                          const std::function<double(double)> &c,
+                         const std::function<double(double, NumVec)> &Fux,
                          int nx,
                          double x_0,
                          double x_n,

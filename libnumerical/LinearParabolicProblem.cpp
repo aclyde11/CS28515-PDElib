@@ -8,6 +8,7 @@ LinearParabolicProblem::LinearParabolicProblem(std::string file_name,
                                                const std::function<double(double)> &init,
                                                const std::function<double(double)> &k,
                                                const std::function<double(double)> &c,
+                                               const std::function<double(double, NumVec)> &Fux,
                                                int nx,
                                                double x_0,
                                                double x_n,
@@ -16,6 +17,7 @@ LinearParabolicProblem::LinearParabolicProblem(std::string file_name,
     : file_name(file_name),
       k(k),
       c(c),
+      Fux(Fux),
       nx(nx),
       x_0(x_0),
       x_n(x_n),
@@ -93,10 +95,10 @@ NumVec LinearParabolicProblem::step(double t, double dt) {
   NumVec F;
   NumVec dU_1(nx), dU_2(nx), RH(nx);
 
-  F = linearizeF(U, dx, dx, t, dt);
-  DF = linearizeDF(U, F, dx, dx, t, dt);
-  LH = (1.0 / dt) * M + S - DF;
-  RH = ((-1 * S) * U + F);
+  F = linearizeF(U, Fux, dx, t, dt);
+  //DF = linearizeDF(U, F, dx, dx, t, dt);
+  LH = (1.0 / dt) * M + S; // -DF
+  RH = (-1 * S) * U + F; // + F
 
   if (bc == dirchlet) {
     LH(0, 0) = 1;

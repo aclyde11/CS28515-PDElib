@@ -148,8 +148,8 @@ NumVec step(std::function<double(double)> k, std::function<double(double)> c,
 
   t += dt;
 
-  F = linearizeF(U, dx, dx, t, dt);
-  DF = linearizeDF(U, F, dx, dx, t, dt);
+//  F = linearizeF(U, dx, dx, t, dt);
+//  DF = linearizeDF(U, F, dx, dx, t, dt);
   LH = (1.0 / dt) * M + S - DF;
   RH = ((-1 * S) * U + F);
 
@@ -222,8 +222,8 @@ void solveMassStiff(std::function<double(double)> k, std::function<double(double
     writeUpdateStep("test.txt", U, t);
     t += dt;
 
-    F = linearizeF(U, m * dx, dx, t, dt);
-    DF = linearizeDF(U, F, m * dx, dx, t, dt);
+//    F = linearizeF(U, m * dx, dx, t, dt);
+    //  DF = linearizeDF(U, F, m * dx, dx, t, dt);
     LH = (1.0 / dt) * M + S - DF;
     RH = ((-1 * S) * U + F);
 
@@ -252,10 +252,14 @@ void solveMassStiff(std::function<double(double)> k, std::function<double(double
   std::cout << "U at t = " << t << ": " << U;
 }
 
-NumVec linearizeF(NumVec U, double x_i, double dx, double t_i, double dt) {
-  NumVec F(U.size());
-
-  return F;
+NumVec linearizeF(NumVec U, std::function<double(double, NumVec)> F, double dx, double t_i, double dt) {
+  NumVec f(U.size());
+  f[0] = -1 * F(dx * 0.5, U);
+  for (int i = 1; i < U.size() - 1; i++) {
+    f[i] += F((i - 1) * dx + dx * 0.5, U) - F((i) * dx + 0.5 * dx, U);
+  }
+  f[f.size() - 1] = F((U.size() - 2) * dx + 0.5 * dx, U);
+  return -1 * f;
 }
 
 TriDiag linearizeDF(NumVec U, NumVec F, double x_i, double dx, double t_i, double dt) {
