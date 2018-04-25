@@ -107,7 +107,6 @@ TriDiag operator*(double a, const TriDiag &B) {
   return C;
 }
 
-//TODO: Make better for tridiag, not general multplciation;
 NumVec TriDiag::operator*(const NumVec &v) const {
   if (dim != v.size()) {
     error("TriDiag * vector: bad sizes");
@@ -125,7 +124,6 @@ NumVec TriDiag::operator*(const NumVec &v) const {
   return y;
 }
 
-//TODO: Make better for tridiag, not general multplciation;
 TriDiag TriDiag::operator*(const TriDiag &B) const {
   if (dim != B.dim)
     error("TriDiag * TriDiag: bad sizes");
@@ -175,9 +173,6 @@ double TriDiag::det_f(int i) {
   return d[i] * det_f(i - 1) - a[i - 1] * b[i - 1] * det_f(i - 2);
 }
 
-/**
- * Thomas algorithm (named after Llewellyn Thomas), is a simplified form of Gaussian elimination
- */
 NumVec solveTriDiagMatrix(const TriDiag &A, const NumVec &y) {
   if (A.dim != y.size()) {
     error("SolveTriDiagMatrix, vector and matrix are different dims.");

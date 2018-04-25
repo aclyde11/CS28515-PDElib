@@ -22,6 +22,9 @@ double operator,(const NumVec& A, const NumVec& B); // (A,B)
 NumVec randomVector(int length, int start, int end);
 NumVec randomRealVector(int length, double start, double end);
 
+/**
+ * computes L2 norm of a vector \sum_{i=0}^n a_i^2
+ */
 double L2norm(NumVec a);
 
 std::ostream& operator<<(std::ostream& os, const NumVec& A);

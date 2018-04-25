@@ -12,51 +12,39 @@
 #include <string>
 #include <iterator>
 
+/*
+ * Generates stiffness matrix for cu_t - ku_xx = F using midpoint method
+ */
 TriDiag generateStiffnessMatrixMidpoint(std::function<double(double)> k, int N, double dx, double x_0);
+
+/*
+ * Generates Mass matrix for cu_t - ku_xx = F using midpoint method
+ */
 TriDiag generateMassMatrixMidpoint(std::function<double(double)> d, int N, double dx, double x_0);
-TriDiag linearizeDF(NumVec U, std::function<double(double, NumVec)> F, double x_i, double dx, double t_i, double dt);
-NumVec linearizeF(NumVec U, std::function<double(double, NumVec)> F, double dx, double t_i, double dt);
 
-NumVec step(std::function<double(double)> k, std::function<double(double)> c,
-    //  std::function<double(double, std::function<double(double, double)>)> F,
-            double t,
-            double x_0,
-            double x_nx,
-            double L,
-            double dx,
-            double dt,
-            int nx,
-            NumVec U, NumVec dU, bool debug, bool dirch);
-void solveMassStiffStepDouble(std::function<double(double)> k, std::function<double(double)> c, double x_0,
-                              double x_nx,
-                              int nx,
-                              int nt,
-                              double tmax,
-                              std::function<double(double)> init, bool debug, bool dirch);
-void solveMassStiff(std::function<double(double)> k, std::function<double(double)> c, double x_0,
-                    double x_nx,
-                    int nx,
-                    int nt,
-                    double tmax,
-                    std::function<double(double)> init);
+/*
+ * This function produces a linear F(x,u) vector from the equation u_t - u_{xx} = F(x,u)
+ */
+TriDiag linearizeDF(NumVec U, NumVec dU, NumVec Fvec, std::function<double(double, double)> F, double dx);
 
-void solveHeatEquation1d(double x_0,
-                         double x_nx,
-                         int nx,
-                         int nt,
-                         double tmax,
-                         double alpha,
-                         std::function<double(double)> init);
-void solveHeatEquation1dStepDoubling(double x_0,
-                                     double x_nx,
-                                     int nx,
-                                     int nt,
-                                     double tmax,
-                                     double alpha,
-                                     std::function<double(double)> init);
+/*
+ * Produces the tridiagional matrix for dF, see linearizeF
+ */
+NumVec linearizeF(NumVec U, std::function<double(double, double)> F, double dx);
 
+/*
+ * approximates 1d interval \int_a^b f(x) dx
+ */
 double simpson_integration(std::function<double(double)> f, double a, double b, int n_intervals);
+
+/*
+ * Writes PDE parameters out to file for python plotting
+ */
 void writeParams(std::string name, std::vector<std::string> params);
+
+/*
+ * Writes vector U at t to data file
+ */
 void writeUpdateStep(std::string name, NumVec a, double t);
 
 #endif //CS28515PROJ1_PDESOLVER_H

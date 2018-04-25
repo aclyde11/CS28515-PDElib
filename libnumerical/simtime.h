@@ -1,5 +1,5 @@
 //
-// Created by Austin Clyde on 4/16/18.
+// Created by Todd Dupont
 //
 
 #ifndef CS28515PROJ1_SIMTIME_H
@@ -21,18 +21,12 @@ class simTime { // class for time step control
   int stepsRejected;
   int stepsAccepted;
   bool newSimulation;
-  simTime() : time(0.0), dt(0.001), dtOld(0.001), tol(1.0e-3), agrow(1.25),
-              ashrink(1.0 / 1.25), dtmin(1.0e-7), dtmax(1.0), endTime(10),
+
+  simTime() : time(0.0), dt(0.001), dtOld(0.001), tol(1.0e-4), agrow(1.2),
+              ashrink(1.0 / 1.2), dtmin(1.0e-6), dtmax(1e-1), endTime(10.0),
               stepsSinceRejection(0), stepsRejected(0), stepsAccepted(true), newSimulation(true) {}
 
-  friend std::ostream &operator<<(std::ostream &os, const simTime &time1) {
-    os << "time: " << time1.time << " dt: " << time1.dt << " dtOld: " << time1.dtOld << " tol: " << time1.tol
-       << " agrow: " << time1.agrow << " ashrink: " << time1.ashrink << " dtmin: " << time1.dtmin << " dtmax: "
-       << time1.dtmax << " endTime: " << time1.endTime << " stepsSinceRejection: " << time1.stepsSinceRejection
-       << " stepsRejected: " << time1.stepsRejected << " stepsAccepted: " << time1.stepsAccepted << " newSimulation: "
-       << time1.newSimulation;
-    return os;
-  };
+  friend std::ostream &operator<<(std::ostream &os, const simTime &time1);
 };
 
 #endif //CS28515PROJ1_SIMTIME_H

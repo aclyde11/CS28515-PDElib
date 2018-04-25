@@ -2,18 +2,18 @@
 // Created by Austin Clyde on 4/24/18.
 //
 
-#include "LinearParabolicProblem.h"
+#include "ParabolicPdeProblem.h"
 
-LinearParabolicProblem::LinearParabolicProblem(std::string file_name,
-                                               const std::function<double(double)> &init,
-                                               const std::function<double(double)> &k,
-                                               const std::function<double(double)> &c,
-                                               const std::function<double(double, NumVec)> &Fux,
-                                               int nx,
-                                               double x_0,
-                                               double x_n,
-                                               const simTime &timeControl,
-                                               BoundryCondition bc)
+ParabolicPdeProblem::ParabolicPdeProblem(std::string file_name,
+                                         const std::function<double(double)> &init,
+                                         const std::function<double(double)> &k,
+                                         const std::function<double(double)> &c,
+                                         const std::function<double(double, double)> &Fux,
+                                         int nx,
+                                         double x_0,
+                                         double x_n,
+                                         const simTime &timeControl,
+                                         BoundryCondition bc)
     : file_name(file_name),
       k(k),
       c(c),
@@ -25,14 +25,14 @@ LinearParabolicProblem::LinearParabolicProblem(std::string file_name,
       bc(bc) {
   dx = (x_n - x_0) / (nx - 1);
 
-  //init U
+  //initializes the vector U based on the init function
   for (int i = 0; i < nx; i++) {
     U.push_back(init(i * dx));
     dU.push_back(0.0);
   }
 }
 
-void LinearParabolicProblem::run() {
+void ParabolicPdeProblem::run() {
   std::vector<std::string> params;
   params.push_back(std::to_string(x_n - x_0));
   params.push_back(std::to_string(nx));
@@ -50,7 +50,7 @@ void LinearParabolicProblem::run() {
   std::cout << timeControl;
 }
 
-void LinearParabolicProblem::advance() {
+void ParabolicPdeProblem::advance() {
   double diff, newdt;
   NumVec dU_1, dU_2;
   timeControl.stepsSinceRejection = 0;
@@ -72,13 +72,15 @@ void LinearParabolicProblem::advance() {
       timeControl.dt = (newdt < timeControl.dtmin) ? timeControl.dtmin : newdt;
     }
 
-    if (timeControl.stepsSinceRejection >= 50 && timeControl.dt == timeControl.dtmin) {
+    // Checks if error is "stuck" and proceeds with a half step after trying for a bit
+    if (timeControl.stepsSinceRejection >= 100 && timeControl.dt == timeControl.dtmin) {
       std::cout << ("WARNING! taking half step\n");
       timeControl.dt = timeControl.dt / 2;
       diff = timeControl.tol;
       dU_1 = step(timeControl.time, timeControl.dt / 2);
       dU_2 = dU_1;
     }
+
   } while (diff > timeControl.tol);
   timeControl.stepsAccepted += 1;
   timeControl.time += timeControl.dt;
@@ -87,18 +89,19 @@ void LinearParabolicProblem::advance() {
   writeUpdateStep(file_name, U, timeControl.time);
 }
 
-NumVec LinearParabolicProblem::step(double t, double dt) {
-
+NumVec ParabolicPdeProblem::step(double t, double dt) {
   TriDiag DF, LH;
   TriDiag M = generateMassMatrixMidpoint(c, nx, dx, x_0);
   TriDiag S = generateStiffnessMatrixMidpoint(k, nx, dx, x_0);
   NumVec F;
   NumVec dU_1(nx), dU_2(nx), RH(nx);
 
-  F = linearizeF(U, Fux, dx, t, dt);
-  //DF = linearizeDF(U, F, dx, dx, t, dt);
-  LH = (1.0 / dt) * M + S; // -DF
-  RH = (-1 * S) * U + F; // + F
+  F = linearizeF(U, Fux, dx);
+  DF = linearizeDF(U, dU, F, Fux, dx);
+  F = F + DF * dU;
+
+  LH = (1.0 / dt) * M + S - DF;
+  RH = (-1 * S) * U + F;
 
   if (bc == dirchlet) {
     LH(0, 0) = 1;
@@ -108,8 +111,8 @@ NumVec LinearParabolicProblem::step(double t, double dt) {
     RH[0] = 0;
     RH[nx - 1] = 0;
   } else if (bc == vonNeumann) {
-    RH[0] += k(x_0) * dU[0];
-    RH[nx - 1] += -1 * k(x_n) * dU[nx - 1];
+    //RH[0] += k(x_0) * dU[0];
+    //RH[nx - 1] +=  k(x_n) * dU[nx - 1];
   }
 
   return solveTriDiagMatrix(LH, RH);

@@ -67,7 +67,7 @@ def update(i):
 if __name__ == '__main__':
     # FuncAnimation will call the 'update' function for each frame; here
     # animating over 10 frames, with an interval of 200ms between frames.
-    anim = FuncAnimation(fig, update, frames=np.arange(0, times.shape[0]), interval=100)
+    anim = FuncAnimation(fig, update, frames=np.arange(0, times.shape[0]), interval=1)
     if len(sys.argv) > 1 and sys.argv[1] == 'save':
         anim.save('line.gif', dpi=80, writer='imagemagick')
     else:
