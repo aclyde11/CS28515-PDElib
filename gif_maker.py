@@ -7,7 +7,7 @@ from matplotlib.animation import FuncAnimation
 pi = 3.14159265
 
 try:
-    text_file = "main/" + sys.argv[1]
+    text_file = sys.argv[1]
 except Exception as e:
     print(e)
 

@@ -4,6 +4,8 @@
 
 #include "ParabolicPdeProblem.h"
 
+#define DEBUG false
+
 ParabolicPdeProblem::ParabolicPdeProblem(std::string file_name,
                                          const std::function<double(double)> &init,
                                          const std::function<double(double)> &k,
@@ -45,7 +47,8 @@ void ParabolicPdeProblem::run() {
 
   while (timeControl.time < timeControl.endTime) {
     advance();
-    std::cout << U;
+    if (DEBUG)
+      std::cout << U;
   }
   std::cout << timeControl;
 }

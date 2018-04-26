@@ -6,7 +6,8 @@ cd CS28515Proj1
 cmake .
 make all
 cd main
-./heat_equations
+./heat_equations -f file.txt
+python ./gif_maker.py file.txt
 ```
 
 | Command | Description |
