@@ -50,6 +50,7 @@ void ParabolicPdeProblem::run() {
     if (DEBUG)
       std::cout << U;
   }
+  std::cout << "Final U: " << U;
 }
 
 void ParabolicPdeProblem::advance() {
