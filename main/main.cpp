@@ -56,6 +56,6 @@ int main(int argc, char *argv[]) {
   start = std::clock();
   pb.run();
   std::cout << "\nCalc Time: " << (std::clock() - start) / (double) (CLOCKS_PER_SEC / 1000.0) << " ms" << std::endl;
-  std::cout << tc;
+  std::cout << tc << std::endl;
   return 0;
 }
