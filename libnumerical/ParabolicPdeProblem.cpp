@@ -50,7 +50,6 @@ void ParabolicPdeProblem::run() {
     if (DEBUG)
       std::cout << U;
   }
-  std::cout << timeControl;
 }
 
 void ParabolicPdeProblem::advance() {

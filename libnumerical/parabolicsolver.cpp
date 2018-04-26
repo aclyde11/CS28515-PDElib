@@ -36,8 +36,6 @@ NumVec linearizeF(NumVec U, std::function<double(double, double)> F, double dx) 
     f[i] += (dx / 2) * (F(dx * i - 0.5 * dx, (U[i] + U[i - 1]) / 2) + F(dx * i + 0.5 * dx, (U[i + 1] + U[i]) / 2));
   }
   f[nx - 1] = (dx / 2) * F(dx * nx - 0.5 * dx, (U[nx - 1] + U[nx - 2]) / 2);
-  std::cout << "print U: " << ((U[nx - 1] + U[nx - 2]) / 2) << "F : " << f;
-
   return f;
 }
 

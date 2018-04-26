@@ -50,6 +50,7 @@ int main(int argc, char *argv[]) {
 
   simTime tc;
   tc.endTime = tmax;
+  std::cout << tc;
   ParabolicPdeProblem pb(file, initf, one, one, F, mesh_points, x_0, x_nx, tc, vonNeumann);
 
   std::clock_t start;
