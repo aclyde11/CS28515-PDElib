@@ -47,5 +47,6 @@ print('fig size: {0} DPI, size in inches {1}'.format(
 
 print matrix.shape
 plt.plot(x, matrix[-1, :], label="pde solver output", linewidth=2)
+plt.title("PDE at time " + str(times[-1]))
 plt.legend()
 plt.show()
