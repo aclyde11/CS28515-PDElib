@@ -4,8 +4,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
-pi = 3.14159265
-
 try:
     text_file = sys.argv[1]
 except Exception as e:
@@ -32,27 +30,15 @@ matrix = np.delete(matrix, 0, 1)
 print times
 print matrix.transpose()
 
-
 x = np.linspace(0, L, nx)
 test = []
 t = tmax
-
 fig, ax = plt.subplots()
 fig.set_tight_layout(True)
 
-# Query the figure's on-screen size and DPI. Note that when saving the figure to
-# a file, we need to provide a DPI for that separately.
-print('fig size: {0} DPI, size in inches {1}'.format(
-    fig.get_dpi(), fig.get_size_inches()))
-
-
-# Plot a scatter that persists (isn't redrawn) and the initial line.
-# ax.scatter(x, x + np.random.normal(0, 3.0, len(x)))
 
 def update(i):
     label = 'time {0}'.format(times[i])
-    # Update the line and the axes (with a new xlabel). Return a tuple of
-    # "artists" that have to be redrawn for this frame.
     ax.set_xlabel(label)
     while len(ax.lines) > 0:
         del ax.lines[0]
@@ -61,7 +47,5 @@ def update(i):
     return ax
 
 if __name__ == '__main__':
-    # FuncAnimation will call the 'update' function for each frame; here
-    # animating over 10 frames, with an interval of 200ms between frames.
     anim = FuncAnimation(fig, update, frames=np.arange(0, times.shape[0]), interval=1)
     plt.show()

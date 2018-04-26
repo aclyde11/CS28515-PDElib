@@ -2,9 +2,6 @@ import sys
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
-
-pi = 3.14159265
 
 try:
     text_file = sys.argv[1]
@@ -33,19 +30,12 @@ matrix = np.delete(matrix, 0, 1)
 matrix = matrix.reshape(-1, nx)
 print matrix.shape
 
-
-
 x = np.linspace(0, L, nx)
 test = []
 t = tmax
 
 fig, ax = plt.subplots()
 fig.set_tight_layout(True)
-
-# Query the figure's on-screen size and DPI. Note that when saving the figure to
-# a file, we need to provide a DPI for that separately.
-print('fig size: {0} DPI, size in inches {1}'.format(
-    fig.get_dpi(), fig.get_size_inches()))
 
 print matrix.shape
 plt.plot(x, matrix[-1, :], label="pde solver output", linewidth=2)
