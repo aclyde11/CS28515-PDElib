@@ -51,7 +51,6 @@ print('fig size: {0} DPI, size in inches {1}'.format(
 
 def update(i):
     label = 'time {0}'.format(times[i])
-    print(label)
     # Update the line and the axes (with a new xlabel). Return a tuple of
     # "artists" that have to be redrawn for this frame.
     ax.set_xlabel(label)
