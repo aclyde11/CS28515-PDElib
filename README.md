@@ -7,3 +7,10 @@ cmake .
 make all
 ./main
 ```
+
+| Command | Description |
+| --- | --- |
+| -f | file name for point output |
+| -n | Number of mesh points, default (default: 15) |
+| -x_0 | Left end point over distance (default: 0) |
+| -x_n | Right end point over distance (default: 3) |
