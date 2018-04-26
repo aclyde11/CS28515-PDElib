@@ -47,6 +47,6 @@ print('fig size: {0} DPI, size in inches {1}'.format(
 
 error = np.linalg.norm(np.abs(matrix[:, -1] - test))
 print matrix.shape
-plt.plot(x, matrix[:, -1], label="pde solver output", linewidth=2)
+plt.plot(x, matrix[-1, :], label="pde solver output", linewidth=2)
 plt.legend()
 plt.show()
