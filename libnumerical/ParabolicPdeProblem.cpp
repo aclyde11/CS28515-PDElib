@@ -44,6 +44,7 @@ void ParabolicPdeProblem::run() {
   params.push_back(std::to_string(timeControl.dt));
   params.push_back(std::to_string(k(1.0)));
   writeParams(file_name, params);
+  writeUpdateStep(file_name, U, 0);
 
   while (timeControl.time < timeControl.endTime) {
     advance();
@@ -54,7 +55,6 @@ void ParabolicPdeProblem::run() {
 }
 
 void ParabolicPdeProblem::advance() {
-  writeUpdateStep(file_name, U, timeControl.time);
   double diff, newdt;
   NumVec dU_1, dU_2;
   timeControl.stepsSinceRejection = 0;
@@ -90,6 +90,7 @@ void ParabolicPdeProblem::advance() {
   timeControl.time += timeControl.dt;
   dU = 0.5 * (dU_1 + dU_2);
   U = U + dU;
+  writeUpdateStep(file_name, U, timeControl.time);
 }
 
 NumVec ParabolicPdeProblem::step(double t, double dt) {
