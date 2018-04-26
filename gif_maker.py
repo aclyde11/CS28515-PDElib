@@ -6,7 +6,11 @@ from matplotlib.animation import FuncAnimation
 
 pi = 3.14159265
 
-text_file = "/Users/austin/CLionProjects/CS28515Proj1/cmake-build-debug/main/test2.txt"
+try:
+    text_file = "main/" + sys.argv[1]
+except Exception as e:
+    print(e)
+
 with open(text_file, 'r') as fin:
     data = fin.read().splitlines(True)
     params = np.fromstring(data[0], sep='\t')
@@ -28,16 +32,9 @@ print times
 print matrix.transpose()
 
 
-
-def func(x, t, alpha):
-    return math.sin(pi * x / L) * math.exp(-1 * alpha * pi * pi * t / L)
-
-
 x = np.linspace(0, L, nx)
 test = []
 t = tmax
-for i in x:
-    test.append(func(i, t, alpha))
 
 fig, ax = plt.subplots()
 fig.set_tight_layout(True)

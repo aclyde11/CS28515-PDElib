@@ -35,6 +35,10 @@ int main(int argc, char *argv[]) {
   if (cmdOptionExists(argv, argv + argc, "-x_n"))
     x_nx = std::stod(getCmdOption(argv, argv + argc, "-x_n"));
 
+  double tmax = 5.0;
+  if (cmdOptionExists(argv, argv + argc, "-tmax"))
+    tmax = std::stod(getCmdOption(argv, argv + argc, "-tmax"));
+
   std::function<double(double)> one = [](double x) { return 1; };
   std::function<double(double, double)> F = [](double x, double U) {
     double g = (0 <= x && x < 1) ? 1 : -4;
@@ -45,6 +49,7 @@ int main(int argc, char *argv[]) {
   };
 
   simTime tc;
+  tc.endTime = tmax;
   ParabolicPdeProblem pb(file, initf, one, one, F, mesh_points, x_0, x_nx, tc, vonNeumann);
 
   std::clock_t start;
