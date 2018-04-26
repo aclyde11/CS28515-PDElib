@@ -27,11 +27,12 @@ alpha = 1
 
 matrix = np.loadtxt(text_file + "tmp", usecols=range(int(nx + 1)))
 os.remove(text_file + "tmp")
-matrix = matrix.reshape(nx, -1)
+matrix = matrix.reshape(-1, nx + 1)
 times = matrix[:, 0]
 matrix = np.delete(matrix, 0, 1)
-print times
-print matrix.transpose()
+matrix = matrix.reshape(-1, nx)
+print matrix.shape
+
 
 
 x = np.linspace(0, L, nx)
