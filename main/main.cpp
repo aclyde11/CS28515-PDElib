@@ -1,17 +1,9 @@
 #include <iostream>
-#include <algorithm>
-#include <cstdlib>
-#include <iostream>
-#include <algorithm>
 #include <vector>
-#include <functional>
 #include <cmath>
-#include <ctime>
-#include <string>
 
 #include "tridiag.h"
 #include "ParabolicPdeProblem.h"
-#include "simtime.h"
 
 int main(int argc, char *argv[]) {
 

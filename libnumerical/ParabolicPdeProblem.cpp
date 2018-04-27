@@ -32,6 +32,10 @@ ParabolicPdeProblem::ParabolicPdeProblem(std::string file_name,
     U.push_back(init(i * dx));
     dU.push_back(0.0);
   }
+
+  // mass and stiffness do not depend on U
+  M = generateMassMatrixMidpoint(c, nx, dx, x_0);
+  S = generateStiffnessMatrixMidpoint(k, nx, dx, x_0);
 }
 
 void ParabolicPdeProblem::run() {
@@ -95,13 +99,11 @@ void ParabolicPdeProblem::advance() {
 
 NumVec ParabolicPdeProblem::step(double t, double dt) {
   TriDiag DF, LH;
-  TriDiag M = generateMassMatrixMidpoint(c, nx, dx, x_0);
-  TriDiag S = generateStiffnessMatrixMidpoint(k, nx, dx, x_0);
   NumVec F;
   NumVec dU_1(nx), dU_2(nx), RH(nx);
 
-  F = linearizeF(U, Fux, dx);
-  DF = linearizeDF(U, dU, F, Fux, dx);
+  F = linerizeF(U, Fux, dx);
+  DF = linerizeDF(U, dU, F, Fux, dx);
   F = F + DF * dU;
 
   LH = (1.0 / dt) * M + S - DF;
@@ -120,4 +122,57 @@ NumVec ParabolicPdeProblem::step(double t, double dt) {
   }
 
   return solveTriDiagMatrix(LH, RH);
+}
+
+TriDiag generateStiffnessMatrixMidpoint(const std::function<double(double)> &k, int N, double dx, double x_0) {
+  TriDiag S(N);
+
+  for (int row = 0; row < N - 1; row++) {
+    S(row, row) += k(x_0 + dx * row + dx / 2) / dx;
+    S(row, row + 1) = -1 * k(x_0 + dx * row + dx / 2) / dx;
+    S(row + 1, row) = -1 * k(x_0 + dx * row + dx / 2) / dx;
+    S(row + 1, row + 1) = k(x_0 + dx * row + dx / 2) / dx;
+  }
+  return S;
+}
+
+TriDiag generateMassMatrixMidpoint(const std::function<double(double)> &c, int N, double dx, double x_0) {
+  TriDiag M(N);
+  for (int row = 0; row < N - 1; row++) {
+    M(row, row) += dx * 0.25 * c(x_0 + dx * row + dx / 2);
+    M(row, row + 1) = dx * 0.25 * c(x_0 + dx * row + dx / 2);
+    M(row + 1, row) = dx * 0.25 * c(x_0 + dx * row + dx / 2);
+    M(row + 1, row + 1) += dx * 0.25 * c(x_0 + dx * row + dx / 2);
+  }
+  return M;
+}
+
+NumVec linerizeF(const NumVec &U, const std::function<double(double, double)> &F, double dx) {
+  NumVec f(U.size());
+  int nx = U.size();
+  f[0] = (dx / 2);
+  F(dx * 0.5, (U[1] + U[0]) / 2);
+  for (int i = 1; i < nx - 1; i++) {
+    f[i] += (dx / 2) * (F(dx * i - 0.5 * dx, (U[i] + U[i - 1]) / 2) + F(dx * i + 0.5 * dx, (U[i + 1] + U[i]) / 2));
+  }
+  f[nx - 1] = (dx / 2) * F(dx * nx - 0.5 * dx, (U[nx - 1] + U[nx - 2]) / 2);
+  return f;
+}
+
+TriDiag linerizeDF(const NumVec &U,
+                   const NumVec &dU,
+                   const NumVec &Fvec,
+                   const std::function<double(double, double)> &F,
+                   double dx) {
+  TriDiag DF(U.size());
+  for (int row = 0; row < U.size() - 1; row++) {
+    DF(row, row) += 0.25 * (F(row * dx + 0.5 * dx, (U[row] + U[row + 1]) / 2));
+    DF(row, row + 1) = 0.25
+        * (F(row * dx + 0.5 * dx, (U[row] + U[row + 1]) / 2) + F((row + 1) * dx + 0.5 * dx, (U[row] + U[row + 1]) / 2));
+    DF(row + 1, row) = 0.25
+        * (F(row * dx + 0.5 * dx, (U[row] + U[row + 1]) / 2) + F((row + 1) * dx + 0.5 * dx, (U[row] + U[row + 1]) / 2));
+    DF(row + 1, row + 1) += 0.25 * (F((row + 1) * dx + 0.5 * dx, (U[row] + U[row + 1]) / 2)
+        + F((row + 1) * dx + 0.5 * dx, (U[row] + U[row + 1]) / 2));
+  }
+  return DF;
 }

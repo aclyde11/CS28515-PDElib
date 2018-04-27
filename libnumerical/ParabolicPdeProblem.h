@@ -9,7 +9,7 @@
 #include "numvec.h"
 #include "tridiag.h"
 #include "simtime.h"
-#include "parabolicsolver.h"
+#include "numericalMethods.h"
 #include "utility.h"
 
 enum BoundryCondition { vonNeumann, dirchlet };
@@ -34,6 +34,7 @@ class ParabolicPdeProblem {
   std::function<double(double, double)> Fux;
   int nx;
   double x_0, x_n, dx;
+  TriDiag M, S;
   simTime timeControl;
   BoundryCondition bc;
   bool debug = true;
@@ -65,5 +66,29 @@ class ParabolicPdeProblem {
  */
   void advance();
 };
+
+/*
+ * Generates stiffness matrix for cu_t - ku_xx = F using midpoint method
+ */
+TriDiag generateStiffnessMatrixMidpoint(const std::function<double(double)> &k, int N, double dx, double x_0);
+
+/*
+ * Generates Mass matrix for cu_t - ku_xx = F using midpoint method
+ */
+TriDiag generateMassMatrixMidpoint(const std::function<double(double)> &d, int N, double dx, double x_0);
+
+/*
+ * This function produces a linear F(x,u) vector from the equation u_t - u_{xx} = F(x,u)
+ */
+TriDiag linerizeDF(const NumVec &U,
+                   const NumVec &dU,
+                   const NumVec &Fvec,
+                   const std::function<double(double, double)> &F,
+                   double dx);
+
+/*
+ * Produces the tridiagional matrix for dF, see linerizeF
+ */
+NumVec linerizeF(const NumVec &U, const std::function<double(double, double)> &F, double dx);
 
 #endif //CS28515PROJ1_LINEARPARABOLICPROBLEM_H
