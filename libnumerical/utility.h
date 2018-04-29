@@ -11,9 +11,11 @@
 #include <string>
 
 void error(std::string s);
+
 void warning(std::string s, std::ostream &out = std::cerr);
 
 char *getCmdOption(char **begin, char **end, const std::string &option);
+
 bool cmdOptionExists(char **begin, char **end, const std::string &option);
 
 /*

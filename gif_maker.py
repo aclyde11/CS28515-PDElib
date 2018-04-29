@@ -1,7 +1,7 @@
-import sys
-import os
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+import os
+import sys
 from matplotlib.animation import FuncAnimation
 
 try:
@@ -45,6 +45,7 @@ def update(i):
     print matrix.shape
     ax.plot(x, matrix[i, :], c="blue")
     return ax
+
 
 if __name__ == '__main__':
     anim = FuncAnimation(fig, update, frames=np.arange(0, times.shape[0]), interval=1)

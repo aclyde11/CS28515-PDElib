@@ -21,6 +21,7 @@ NumVec operator-(const NumVec &A, const NumVec &B); // A-B
 double operator,(const NumVec &A, const NumVec &B); // (A,B)
 
 NumVec randomVector(int length, int start, int end);
+
 NumVec randomRealVector(int length, double start, double end);
 
 /**

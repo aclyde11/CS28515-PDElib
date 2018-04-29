@@ -15,57 +15,67 @@
 
 class TriDiag {
 
- public:
-  int dim;
-  NumVec a;
-  NumVec d;
-  NumVec b;
+public:
+    int dim;
+    NumVec a;
+    NumVec d;
+    NumVec b;
 
-  //Constructors
-  TriDiag();
-  TriDiag(int n);
-  TriDiag(int n, double p); // fill matrix entries with value p
-  TriDiag(const TriDiag &A); //deep copies A
+    //Constructors
+    TriDiag();
 
-  //fills matrix with random entries (used for testing)
-  void randomize();
-  void randomize(int start, int end);
-  void randomizeReals(double start, double end);
+    TriDiag(int n);
 
-  //Operators
-  double &operator()(int i, int j);
-  double operator()(int i, int j) const;
-  bool operator==(const TriDiag &B) const;
-  TriDiag operator+(const TriDiag &B) const; // A+B
-  NumVec operator*(const NumVec &v) const;
-  TriDiag operator*(const TriDiag &B) const;
-  TriDiag operator-(const TriDiag &B) const;
+    TriDiag(int n, double p); // fill matrix entries with value p
+    TriDiag(const TriDiag &A); //deep copies A
 
-  /*
-   * Pointwise maps function over matrix entries
-   */
-  void map(std::function<double(double)> func);
+    //fills matrix with random entries (used for testing)
+    void randomize();
 
-  //Getters
-  NumVec getRow(int r) const;
-  NumVec getCol(int c) const;
+    void randomize(int start, int end);
 
-  //Functions on Matricies
-  /*
-   * Computes the determinate of the matrix in O(n)
-   */
-  double det();
+    void randomizeReals(double start, double end);
 
- private:
-  /*
-   * Helper Function for det()
-   */
-  double det_f(int i);
+    //Operators
+    double &operator()(int i, int j);
 
-  /*
-   * Maps a pointwise binary operator over this (+) B
-   */
-  TriDiag binary(const TriDiag &B, std::function<double(double, double)> func) const;
+    double operator()(int i, int j) const;
+
+    bool operator==(const TriDiag &B) const;
+
+    TriDiag operator+(const TriDiag &B) const; // A+B
+    NumVec operator*(const NumVec &v) const;
+
+    TriDiag operator*(const TriDiag &B) const;
+
+    TriDiag operator-(const TriDiag &B) const;
+
+    /*
+     * Pointwise maps function over matrix entries
+     */
+    void map(std::function<double(double)> func);
+
+    //Getters
+    NumVec getRow(int r) const;
+
+    NumVec getCol(int c) const;
+
+    //Functions on Matricies
+    /*
+     * Computes the determinate of the matrix in O(n)
+     */
+    double det();
+
+private:
+    /*
+     * Helper Function for det()
+     */
+    double det_f(int i);
+
+    /*
+     * Maps a pointwise binary operator over this (+) B
+     */
+    TriDiag binary(const TriDiag &B, std::function<double(double, double)> func) const;
 };
 
 TriDiag operator*(double a, const TriDiag &B); // a*B#
