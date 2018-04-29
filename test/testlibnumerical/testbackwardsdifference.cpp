@@ -4,7 +4,8 @@
 
 #include "tridiagtest.h"
 
-TEST_F(BackwardsDifferenceTest, basic_heat_eq) {
+TEST_F(BackwardsDifferenceTest, basic_heat_eq
+) {
 
-  assert(true == true);
+assert(true == true);
 }

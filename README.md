@@ -1,4 +1,12 @@
 # For CS Class on Partial Differential Equations
+
+This project includes my **numerical library** 
+(numerlicallib) supporting vector and tri-diagonal matrix operations and
+and **pde solver library** (pdesolverslib), currently supporting equations of the form 
+c(x)u_x - (k(x)u_x)_x = F(x,u), such as the heat equation and logisitic function.
+
+###
+
 To use:
 ```
 git clone https://github.com/aclyde11/CS28515Proj1.git
@@ -6,8 +14,8 @@ cd CS28515Proj1
 cmake .
 make all
 cd main
-./heat_equations -f file.txt
-python ./gif_maker.py file.txt
+./main -f file.txt
+python ../gif_maker.py file.txt //produces gif modeling pde
 ```
 
 | Command | Description |
