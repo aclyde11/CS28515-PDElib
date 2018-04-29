@@ -7,6 +7,7 @@ add_definitions(-Wall -std=c++0x)
 SET(CMAKE_INCLUDE_CURRENT_DIR ON)
 ADD_SUBDIRECTORY(main)
 ADD_SUBDIRECTORY(libnumerical)
+ADD_SUBDIRECTORY(libpdesolvers)
 
 option (enable-test "Compile all project unit tests" ON)
 

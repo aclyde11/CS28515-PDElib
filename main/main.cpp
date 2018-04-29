@@ -3,7 +3,7 @@
 #include <cmath>
 
 #include "tridiag.h"
-#include "ParabolicPdeProblem.h"
+#include "../libpdesolvers/ParabolicPdeProblem.h"
 
 int main(int argc, char *argv[]) {
 
@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
   if (cmdOptionExists(argv, argv + argc, "-init_value"))
     init = std::stod(getCmdOption(argv, argv + argc, "-init_value"));
 
-  int mesh_points = 15;
+  int mesh_points = 1500;
   if (cmdOptionExists(argv, argv + argc, "-n"))
     mesh_points = std::stoi(getCmdOption(argv, argv + argc, "-n"));
 
