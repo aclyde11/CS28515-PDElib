@@ -49,15 +49,18 @@ public:
     void advance();
 };
 
-NumVec periodic_solve(const TriDiag &A, const NumVec &R);
+/*
+ * Approximations periodic solution Ax=R by X=X_0 + aX_1
+ */
+NumVec periodic_solve(const TriDiag &A, NumVec R);
 
 /*
- * Generates stiffness matrix for cu_t - ku_xx = F using midpoint method
+ * Generates stiffness matrix
  */
 TriDiag generateStiffnessMatrixMidpoint(const std::function<double(double)> &k, int N, double dx, double x_0);
 
 /*
- * Generates Mass matrix for cu_t - ku_xx = F using midpoint method
+ * Generates Mass matrix
  */
 TriDiag generateMassMatrixMidpoint(const std::function<double(double)> &d, int N, double dx, double x_0);
 

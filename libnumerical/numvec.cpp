@@ -69,6 +69,10 @@ NumVec randomRealVector(int length, double start, double end) {
     return r;
 }
 
+NumVec zeros(int n) {
+    return NumVec(n);
+}
+
 double L2norm(NumVec a) {
     double d = 0;
     for (int i = 0; i < a.size(); i++)

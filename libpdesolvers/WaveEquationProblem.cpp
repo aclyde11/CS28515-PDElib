@@ -67,17 +67,43 @@ NumVec WaveEquationProblem::step(double t, double dt) {
     TriDiag DF, LH;
     NumVec dU_1(nx), dU_2(nx), RH(nx);
     double theta = 0.25;
+    double dt_sq = dt * dt;
 
-    LH = (1.0 / (dt * dt)) * (M + ((dt * dt * theta) * S));
-    RH = -1.0 * (S * U) + (1.0 / (dt * dt)) * (M + ((dt * dt * theta) * S)) * dU;
+    LH = (1.0 / dt_sq) * (M + ((dt_sq * theta) * S));
+    RH = -1.0 * (S * U) + (1.0 / dt_sq) * (M + ((dt_sq * theta) * S)) * dU;
 
     return periodic_solve(LH, RH); //dU new
 }
-NumVec periodic_solve(const TriDiag &A, const NumVec &R) {
 
+NumVec periodic_solve(const TriDiag &A, NumVec R) {
+    int n = A.dim;
+    NumVec X(n), X1(n), X0(n);
 
+    //Modify A
+    TriDiag Amod;
 
-    return NumVec();
+    //Modify R
+    R[0] += R[n - 1];
+    R[n - 1] = 0;
+
+    //Solve X0
+    X0[0] = 0;
+    X[n - 1] = 0;
+    //solve(Amod * * X0 = R)
+    //TODO
+
+    //Solve X1
+    X1[0] = 1;
+    X1[n - 1] = 1;
+    //solve(Amod * X1 = zeros(n)
+    //TODO
+
+    double a;
+    //Solve a so X = X0 + aX1 is a solution
+    a = -1.0 * (Amod(0, 0) * X0[0] + Amod(0, 1) * X0[1] + Amod(0, n - 2) * X0[n - 2]) /
+        (Amod(0, 0) * X1[0] + Amod(0, 1) * X1[1] + Amod(0, n - 2) * X1[n - 2]);
+
+    return X0 + a * X1;
 }
 
 

@@ -24,6 +24,9 @@ NumVec randomVector(int length, int start, int end);
 
 NumVec randomRealVector(int length, double start, double end);
 
+// defines zero vector
+NumVec zeros(int n);
+
 /**
  * computes L2 norm of a vector \sum_{i=0}^n a_i^2
  */
