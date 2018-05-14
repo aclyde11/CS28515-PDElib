@@ -3,7 +3,7 @@
 #include <cmath>
 
 #include "tridiag.h"
-#include "../libpdesolvers/ParabolicPdeProblem.h"
+#include "ParabolicPdeProblem.h"
 
 int main(int argc, char *argv[]) {
 
@@ -11,11 +11,11 @@ int main(int argc, char *argv[]) {
     if (cmdOptionExists(argv, argc + argv, "-f"))
         file = getCmdOption(argv, argc + argv, "-f");
 
-    double init = 0.8;
+    double init = 1e-6;
     if (cmdOptionExists(argv, argv + argc, "-init_value"))
         init = std::stod(getCmdOption(argv, argv + argc, "-init_value"));
 
-    int mesh_points = 1500;
+    int mesh_points = 100;
     if (cmdOptionExists(argv, argv + argc, "-n"))
         mesh_points = std::stoi(getCmdOption(argv, argv + argc, "-n"));
 
@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
     if (cmdOptionExists(argv, argv + argc, "-x_n"))
         x_nx = std::stod(getCmdOption(argv, argv + argc, "-x_n"));
 
-    double tmax = 5.0;
+    double tmax = 10.0;
     if (cmdOptionExists(argv, argv + argc, "-tmax"))
         tmax = std::stod(getCmdOption(argv, argv + argc, "-tmax"));
 

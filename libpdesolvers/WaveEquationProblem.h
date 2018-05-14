@@ -20,6 +20,8 @@
 #include "numericalMethods.h"
 #include "utility.h"
 
+#include <Eigen/Dense>
+
 class WaveEquationProblem {
 
 public:
@@ -36,6 +38,8 @@ public:
 
     void advance();
 };
+
+NumVec periodic_solve(TriDiag A, NumVec R);
 
 
 #endif //CS28515PROJ1_LINEARPARABOLICPROBLEM_H

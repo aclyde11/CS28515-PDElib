@@ -15,3 +15,15 @@ void WaveEquationProblem::run() {
 void WaveEquationProblem::advance() {
 
 }
+
+NumVec periodic_solve(const TriDiag &A, const NumVec &R) {
+    //update A by perodic conditions
+
+    //set RHS(0)=RHS(N)=0, Solve X0
+
+    //set RHS(0)=RHS(N)=1 solve X1
+
+    //X = X0 + alpha X1
+
+    return NumVec();
+}
