@@ -71,16 +71,6 @@ public:
 };
 
 /*
- * Generates stiffness matrix for cu_t - ku_xx = F using midpoint method
- */
-TriDiag generateStiffnessMatrixMidpoint(const std::function<double(double)> &k, int N, double dx, double x_0);
-
-/*
- * Generates Mass matrix for cu_t - ku_xx = F using midpoint method
- */
-TriDiag generateMassMatrixMidpoint(const std::function<double(double)> &d, int N, double dx, double x_0);
-
-/*
  * This function produces a linear F(x,u) vector from the equation u_t - u_{xx} = F(x,u)
  */
 TriDiag linerizeDF(const NumVec &U,

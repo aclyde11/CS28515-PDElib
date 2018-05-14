@@ -6,13 +6,6 @@
 #define CS28515PROJ1_WAVEEQUATIONPROBLEM_H
 
 
-//
-// Created by Austin Clyde on 4/24/18.
-//
-
-#ifndef CS28515PROJ1_LINEARPARABOLICPROBLEM_H
-#define CS28515PROJ1_LINEARPARABOLICPROBLEM_H
-
 #include <string>
 #include "numvec.h"
 #include "tridiag.h"
@@ -53,21 +46,6 @@ public:
  * Approximations periodic solution Ax=R by X=X_0 + aX_1
  */
 NumVec periodic_solve(const TriDiag &A, NumVec R);
-
-/*
- * Generates stiffness matrix
- */
-TriDiag generateStiffnessMatrixMidpoint(const std::function<double(double)> &k, int N, double dx, double x_0);
-
-/*
- * Generates Mass matrix
- */
-TriDiag generateMassMatrixMidpoint(const std::function<double(double)> &d, int N, double dx, double x_0);
-
-
-
-#endif //CS28515PROJ1_LINEARPARABOLICPROBLEM_H
-
 
 
 #endif //CS28515PROJ1_WAVEEQUATIONPROBLEM_H

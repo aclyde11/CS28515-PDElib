@@ -105,27 +105,3 @@ NumVec periodic_solve(const TriDiag &A, NumVec R) {
 
     return X0 + a * X1;
 }
-
-
-TriDiag generateStiffnessMatrixMidpoint(const std::function<double(double)> &k, int N, double dx, double x_0) {
-    TriDiag S(N);
-
-    for (int row = 0; row < N - 1; row++) {
-        S(row, row) += k(x_0 + dx * row + dx / 2) / dx;
-        S(row, row + 1) = -1 * k(x_0 + dx * row + dx / 2) / dx;
-        S(row + 1, row) = -1 * k(x_0 + dx * row + dx / 2) / dx;
-        S(row + 1, row + 1) = k(x_0 + dx * row + dx / 2) / dx;
-    }
-    return S;
-}
-
-TriDiag generateMassMatrixMidpoint(const std::function<double(double)> &c, int N, double dx, double x_0) {
-    TriDiag M(N);
-    for (int row = 0; row < N - 1; row++) {
-        M(row, row) += dx * 0.25 * c(x_0 + dx * row + dx / 2);
-        M(row, row + 1) = dx * 0.25 * c(x_0 + dx * row + dx / 2);
-        M(row + 1, row) = dx * 0.25 * c(x_0 + dx * row + dx / 2);
-        M(row + 1, row + 1) += dx * 0.25 * c(x_0 + dx * row + dx / 2);
-    }
-    return M;
-}

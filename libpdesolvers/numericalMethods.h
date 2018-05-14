@@ -17,4 +17,14 @@
  */
 double simpson_integration(std::function<double(double)> f, double a, double b, int n_intervals);
 
+/*
+ * Generates stiffness matrix
+ */
+TriDiag generateStiffnessMatrixMidpoint(const std::function<double(double)> &k, int N, double dx, double x_0);
+
+/*
+ * Generates Mass matrix
+ */
+TriDiag generateMassMatrixMidpoint(const std::function<double(double)> &d, int N, double dx, double x_0);
+
 #endif //CS28515PROJ1_numericalMethods_H
