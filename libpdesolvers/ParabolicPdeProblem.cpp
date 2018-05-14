@@ -100,7 +100,7 @@ void ParabolicPdeProblem::advance() {
 NumVec ParabolicPdeProblem::step(double t, double dt) {
     TriDiag DF, LH;
     NumVec F;
-    NumVec dU_1(nx), dU_2(nx), RH(nx);
+    NumVec RH(nx);
 
     F = linerizeF(U, Fux, dx);
     DF = linerizeDF(U, dU, F, Fux, dx);
@@ -116,9 +116,6 @@ NumVec ParabolicPdeProblem::step(double t, double dt) {
         LH(nx - 1, nx - 2) = 0;
         RH[0] = 0;
         RH[nx - 1] = 0;
-    } else if (bc == vonNeumann) {
-        //RH[0] += k(x_0) * dU[0];
-        //RH[nx - 1] +=  k(x_n) * dU[nx - 1];
     }
 
     return solveTriDiagMatrix(LH, RH);

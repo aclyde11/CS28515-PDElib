@@ -3,7 +3,8 @@
 #include <cmath>
 
 #include "tridiag.h"
-#include "ParabolicPdeProblem.h"
+//#include "ParabolicPdeProblem.h"
+#include "WaveEquationProblem.h"
 
 int main(int argc, char *argv[]) {
 
@@ -42,7 +43,7 @@ int main(int argc, char *argv[]) {
 
     simTime tc;
     tc.endTime = tmax;
-    ParabolicPdeProblem pb(file, initf, one, one, F, mesh_points, x_0, x_nx, tc, vonNeumann);
+    WaveEquationProblem pb(file, initf, one, one, mesh_points, x_0, x_nx, tc);
 
     std::clock_t start;
     start = std::clock();
