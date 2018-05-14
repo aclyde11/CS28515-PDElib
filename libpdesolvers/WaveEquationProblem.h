@@ -20,8 +20,6 @@
 #include "numericalMethods.h"
 #include "utility.h"
 
-#include <Eigen/Dense>
-
 class WaveEquationProblem {
 
 public:
