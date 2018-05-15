@@ -13,7 +13,7 @@ void run_proj2(int argc, char *argv[]) {
     if (cmdOptionExists(argv, argc + argv, "-f"))
         file = getCmdOption(argv, argc + argv, "-f");
 
-    int mesh_points = 100;
+    int mesh_points = 15;
     if (cmdOptionExists(argv, argv + argc, "-n"))
         mesh_points = std::stoi(getCmdOption(argv, argv + argc, "-n"));
 
@@ -53,6 +53,10 @@ void run_proj2(int argc, char *argv[]) {
     tc.dt = 0.001;
     tc.endTime = tmax;
     WaveEquationProblem pb(file, initf, kx, cx, mesh_points, x_0, x_nx, tc);
+
+    TriDiag M = generateStiffnessMatrixMidpoint(cx, 10, 0.01, 0);
+    std::cout << M;
+    std::cout << M.submatrix(0, 2);
 
     std::clock_t start;
     start = std::clock();

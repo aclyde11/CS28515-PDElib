@@ -66,6 +66,8 @@ public:
      */
     double det();
 
+    TriDiag submatrix(int start, int end);
+
 private:
     /*
      * Helper Function for det()

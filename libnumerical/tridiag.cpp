@@ -202,6 +202,26 @@ NumVec solveTriDiagMatrix(const TriDiag &A, const NumVec &y) {
     return x;
 }
 
+TriDiag TriDiag::submatrix(int start, int end) {
+    if (end - start <= 0)
+        error("Bad submatrix indicies");
+
+    TriDiag sub(end - start + 1);
+    std::vector<double>::const_iterator first = d.begin() + start;
+    std::vector<double>::const_iterator last = d.begin() + (end + 2);
+    sub.d = std::vector<double>(first, last);
+
+    first = a.begin() + start;
+    last = a.begin() + (end + 1);
+    sub.a = std::vector<double>(first, last);
+
+    first = b.begin() + start;
+    last = b.begin() + (end + 1);
+    sub.b = std::vector<double>(first, last);
+
+    return sub;
+}
+
 std::ostream &operator<<(std::ostream &os, const TriDiag &A) {
     for (int i = 0; i < A.dim; i++) {
         for (int j = 0; j < A.dim; j++) {

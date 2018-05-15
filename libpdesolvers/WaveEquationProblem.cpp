@@ -4,7 +4,7 @@
 
 #include "WaveEquationProblem.h"
 
-#define DEBUG 1
+#define DEBUG 0
 
 WaveEquationProblem::WaveEquationProblem(std::string file_name,
                                          const std::function<double(double)> &init,
@@ -29,6 +29,10 @@ WaveEquationProblem::WaveEquationProblem(std::string file_name,
         U.push_back(init(i * dx));
         dU.push_back(0.0);
     }
+    U[nx - 1] = 0;
+
+    if (DEBUG)
+        std::cout << "Init U: " << U;
 
     // mass and stiffness do not depend on U
     M = generateMassMatrixMidpoint(c, nx, dx, x_0);
@@ -75,33 +79,24 @@ NumVec WaveEquationProblem::step(double t, double dt) {
     return periodic_solve(LH, RH); //dU new
 }
 
-NumVec periodic_solve(const TriDiag &A, NumVec R) {
+NumVec periodic_solve(TriDiag &A, NumVec R) {
     int n = A.dim;
-    NumVec X(n), X1(n), X0(n);
+    NumVec X(n), X0(n), X1(n);
+    A(0, 0) = 1;
+    A(n - 1, n - 1) = 1;
 
-    //Modify A
-    TriDiag Amod;
+    NumVec R0(R), R1(n);
+    R0[0] = 0;
+    R0[n - 1] = 0;
+    X0 = solveTriDiagMatrix(A, R0);
 
-    //Modify R
-    R[0] += R[n - 1];
-    R[n - 1] = 0;
+    R1[0] = 1;
+    R1[n - 1] = 1;
+    X1 = solveTriDiagMatrix(A, R1);
 
-    //Solve X0
-    X0[0] = 0;
-    X[n - 1] = 0;
-    //solve(Amod * * X0 = R)
-    //TODO
+    double alpha = -1 * ((A.d[0] + A.d[n - 1]) * X0[0] + A.a[0] * X0[1] + A.b[n - 2] * X0[n - 1]) /
+                   ((A.d[0] + A.d[n - 1]) * X1[0] + A.a[0] * X1[1] + A.b[n - 2] * X1[n - 1]);
 
-    //Solve X1
-    X1[0] = 1;
-    X1[n - 1] = 1;
-    //solve(Amod * X1 = zeros(n)
-    //TODO
-
-    double a;
-    //Solve a so X = X0 + aX1 is a solution
-    a = -1.0 * (Amod(0, 0) * X0[0] + Amod(0, 1) * X0[1] + Amod(0, n - 2) * X0[n - 2]) /
-        (Amod(0, 0) * X1[0] + Amod(0, 1) * X1[1] + Amod(0, n - 2) * X1[n - 2]);
-
-    return X0 + a * X1;
+    X = X0 + alpha * X1;
+    return X;
 }
