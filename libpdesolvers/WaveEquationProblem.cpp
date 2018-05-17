@@ -8,6 +8,7 @@
 
 WaveEquationProblem::WaveEquationProblem(std::string file_name,
                                          const std::function<double(double)> &init,
+                                         const std::function<double(double)> &initdU,
                                          const std::function<double(double)> &k,
                                          const std::function<double(double)> &c,
                                          int nx,
@@ -27,7 +28,7 @@ WaveEquationProblem::WaveEquationProblem(std::string file_name,
     //initializes the vector U based on the init function
     for (int i = 0; i < nx; i++) {
         U.push_back(init(i * dx));
-        dU.push_back(0.0);
+        dU.push_back(initdU(i * dx));
     }
     U[nx - 1] = 0;
 
@@ -70,7 +71,7 @@ void WaveEquationProblem::advance() {
 NumVec WaveEquationProblem::step(double t, double dt) {
     TriDiag DF, LH;
     NumVec dU_1(nx), dU_2(nx), RH(nx);
-    double theta = 0.25;
+    double theta = 0.5;
     double dt_sq = dt * dt;
 
     LH = (1.0 / dt_sq) * (M + ((dt_sq * theta) * S));
@@ -79,7 +80,7 @@ NumVec WaveEquationProblem::step(double t, double dt) {
     return periodic_solve(LH, RH); //dU new
 }
 
-NumVec periodic_solve(TriDiag &A, NumVec R) {
+NumVec periodic_solve(TriDiag A, NumVec R) {
     int n = A.dim;
     NumVec X(n), X0(n), X1(n);
     A(0, 0) = 1;
@@ -98,5 +99,6 @@ NumVec periodic_solve(TriDiag &A, NumVec R) {
                    ((A.d[0] + A.d[n - 1]) * X1[0] + A.a[0] * X1[1] + A.b[n - 2] * X1[n - 1]);
 
     X = X0 + alpha * X1;
+
     return X;
 }

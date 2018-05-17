@@ -33,7 +33,7 @@ void run_proj2(int argc, char *argv[]) {
     if (cmdOptionExists(argv, argv + argc, "-x_n"))
         x_nx = std::stod(getCmdOption(argv, argv + argc, "-x_n"));
 
-    double tmax = 3.0;
+    double tmax = 1.0;
     if (cmdOptionExists(argv, argv + argc, "-tmax"))
         tmax = std::stod(getCmdOption(argv, argv + argc, "-tmax"));
 
@@ -49,10 +49,14 @@ void run_proj2(int argc, char *argv[]) {
         return sin(x);
     };
 
+    std::function<double(double)> initdU = [](double x) -> double {
+        return 0.0;
+    };
+
     simTime tc;
     tc.dt = 0.001;
     tc.endTime = tmax;
-    WaveEquationProblem pb(file, initf, kx, cx, mesh_points, x_0, x_nx, tc);
+    WaveEquationProblem pb(file, initf, initdU, kx, cx, mesh_points, x_0, x_nx, tc);
 
     TriDiag M = generateStiffnessMatrixMidpoint(cx, 10, 0.01, 0);
     std::cout << M;

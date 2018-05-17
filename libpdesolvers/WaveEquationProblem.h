@@ -27,6 +27,7 @@ public:
 
     WaveEquationProblem(std::string file_name,
                         const std::function<double(double)> &init,
+                        const std::function<double(double)> &initdU,
                         const std::function<double(double)> &k,
                         const std::function<double(double)> &c,
                         int nx,
@@ -45,7 +46,7 @@ public:
 /*
  * Approximations periodic solution Ax=R by X=X_0 + aX_1
  */
-NumVec periodic_solve(TriDiag &A, NumVec R);
+NumVec periodic_solve(TriDiag A, NumVec R);
 
 
 #endif //CS28515PROJ1_WAVEEQUATIONPROBLEM_H
