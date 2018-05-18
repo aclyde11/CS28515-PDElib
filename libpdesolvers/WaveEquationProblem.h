@@ -46,7 +46,7 @@ public:
 /*
  * Approximations periodic solution Ax=R by X=X_0 + aX_1
  */
-NumVec periodic_solve(TriDiag A, NumVec R);
+NumVec periodic_solve(const TriDiag &A, const NumVec &R);
 
 
 #endif //CS28515PROJ1_WAVEEQUATIONPROBLEM_H

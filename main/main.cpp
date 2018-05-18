@@ -6,14 +6,14 @@
 #include "WaveEquationProblem.h"
 #include "ParabolicPdeProblem.h"
 
-#define PI 3.14592653589
+#define PI 3.141592653589
 
 void run_proj2(int argc, char *argv[]) {
     std::string file = "test1.txt";
     if (cmdOptionExists(argv, argc + argv, "-f"))
         file = getCmdOption(argv, argc + argv, "-f");
 
-    int mesh_points = 15;
+    int mesh_points = 7;
     if (cmdOptionExists(argv, argv + argc, "-n"))
         mesh_points = std::stoi(getCmdOption(argv, argv + argc, "-n"));
 
@@ -33,7 +33,7 @@ void run_proj2(int argc, char *argv[]) {
     if (cmdOptionExists(argv, argv + argc, "-x_n"))
         x_nx = std::stod(getCmdOption(argv, argv + argc, "-x_n"));
 
-    double tmax = 1.0;
+    double tmax = 5;
     if (cmdOptionExists(argv, argv + argc, "-tmax"))
         tmax = std::stod(getCmdOption(argv, argv + argc, "-tmax"));
 
@@ -49,18 +49,17 @@ void run_proj2(int argc, char *argv[]) {
         return sin(x);
     };
 
-    std::function<double(double)> initdU = [](double x) -> double {
-        return 0.0;
+    simTime tc;
+    tc.endTime = tmax;
+    double dt = 0.01;
+    tc.dt = dt;
+    std::function<double(double)> initdU = [dt](double x) -> double {
+        return -1 * cos(x) * dt;
     };
 
-    simTime tc;
-    tc.dt = 0.001;
-    tc.endTime = tmax;
+
     WaveEquationProblem pb(file, initf, initdU, kx, cx, mesh_points, x_0, x_nx, tc);
 
-    TriDiag M = generateStiffnessMatrixMidpoint(cx, 10, 0.01, 0);
-    std::cout << M;
-    std::cout << M.submatrix(0, 2);
 
     std::clock_t start;
     start = std::clock();
