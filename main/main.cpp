@@ -13,7 +13,7 @@ void run_proj2(int argc, char *argv[]) {
     if (cmdOptionExists(argv, argc + argv, "-f"))
         file = getCmdOption(argv, argc + argv, "-f");
 
-    int mesh_points = 7;
+    int mesh_points = 128;
     if (cmdOptionExists(argv, argv + argc, "-n"))
         mesh_points = std::stoi(getCmdOption(argv, argv + argc, "-n"));
 
@@ -33,6 +33,14 @@ void run_proj2(int argc, char *argv[]) {
     if (cmdOptionExists(argv, argv + argc, "-x_n"))
         x_nx = std::stod(getCmdOption(argv, argv + argc, "-x_n"));
 
+    int periods = 2;
+    if (cmdOptionExists(argv, argv + argc, "-x_n"))
+        periods = std::stoi(getCmdOption(argv, argv + argc, "-x_n"));
+
+    double dt = 0.01;
+    if (cmdOptionExists(argv, argv + argc, "-dt"))
+        dt = std::stod(getCmdOption(argv, argv + argc, "-dt"));
+
     double tmax = 5;
     if (cmdOptionExists(argv, argv + argc, "-tmax"))
         tmax = std::stod(getCmdOption(argv, argv + argc, "-tmax"));
@@ -45,21 +53,19 @@ void run_proj2(int argc, char *argv[]) {
         return (x >= 0 && x <= PI) ? 1 : k_0;
     };
 
-    std::function<double(double)> initf = [](double x) -> double {
-        return sin(x);
+    std::function<double(double)> initf = [periods, dt](double x) -> double {
+        return sin(periods * x) - cos(x) * dt;
     };
+
+    std::function<double(double)> initdU = [periods, dt](double x) -> double {
+        return -1 * periods * cos(periods * x) * dt;
+    };
+
 
     simTime tc;
     tc.endTime = tmax;
-    double dt = 0.01;
     tc.dt = dt;
-    std::function<double(double)> initdU = [dt](double x) -> double {
-        return -1 * cos(x) * dt;
-    };
-
-
     WaveEquationProblem pb(file, initf, initdU, kx, cx, mesh_points, x_0, x_nx, tc);
-
 
     std::clock_t start;
     start = std::clock();
