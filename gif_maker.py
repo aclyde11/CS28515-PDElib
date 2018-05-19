@@ -42,11 +42,11 @@ def update(i):
     ax.set_xlabel(label)
     while len(ax.lines) > 0:
         del ax.lines[0]
-    print matrix.shape
     ax.plot(x, matrix[i, :], c="blue")
     return ax
 
 
 if __name__ == '__main__':
-    anim = FuncAnimation(fig, update, frames=np.arange(0, times.shape[0]), interval=1)
+    anim = FuncAnimation(fig, update, frames=times.shape[0], interval=20)
     plt.show()
+    # anim.save('line.gif', writer='imagemagick')

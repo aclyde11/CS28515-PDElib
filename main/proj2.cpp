@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
     if (cmdOptionExists(argv, argc + argv, "-f"))
         file = getCmdOption(argv, argc + argv, "-f");
 
-    int mesh_points = 128;
+    int mesh_points = 100;
     if (cmdOptionExists(argv, argv + argc, "-n"))
         mesh_points = std::stoi(getCmdOption(argv, argv + argc, "-n"));
 
@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
     };
 
     std::function<double(double)> initf = [periods, dt](double x) -> double {
-        return sin(periods * x) - cos(x) * dt;
+        return sin(periods * x) - cos(periods * x) * dt;
     };
 
     std::function<double(double)> initdU = [periods, dt](double x) -> double {
