@@ -2,8 +2,8 @@
 
 This project includes my **numerical library** 
 (numerlicallib) supporting vector and tri-diagonal matrix operations and
-and **pde solver library** (pdesolverslib), currently supporting equations of the form 
-c(x)u_x - (k(x)u_x)_x = F(x,u), such as the heat equation and logisitic function.
+and **pde solver library** (pdesolverslib). proj1 is for the heat equation and proj2 is
+for the wave equation.
 
 ###
 
@@ -14,7 +14,8 @@ cd CS28515Proj1
 cmake .
 make all
 cd main
-./main -f file.txt
+./proj1 -f file.txt
+./proj2 -f file.txt
 python ../gif_maker.py file.txt //produces gif modeling pde
 ```
 
@@ -26,3 +27,7 @@ python ../gif_maker.py file.txt //produces gif modeling pde
 | -x_n | Right end point over distance (default: 3) |
 | -init_value | For this genetics problem, set the starting value of U(x,o) |
 | -tmax | Set max simulation time (default: 5) |
+| -c0 | Set mass matrix value |
+| -k0 | Set stiffness matrix value |
+| -dt | Set dt |
+| -periods | set number of periods |
