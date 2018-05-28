@@ -10,9 +10,8 @@
 #include <vector>
 #include <cmath>
 
-#include "tridiag.h"
-#include "WaveEquationProblem.h"
-#include "ParabolicPdeProblem.h"
+#include "test.h"
+#include "utility.h"
 
 #define PI 3.141592653589
 
@@ -69,16 +68,7 @@ int main(int argc, char *argv[]) {
         return -1 * periods * cos(periods * x) * dt;
     };
 
-    simTime tc;
-    tc.endTime = tmax;
-    tc.dt = dt;
-    WaveEquationProblem pb(file, initf, initdU, kx, cx, mesh_points, x_0, x_nx, tc);
-
-    std::clock_t start;
-    start = std::clock();
-    pb.run();
-    std::cout << "\nCalc Time: " << (std::clock() - start) / (double) (CLOCKS_PER_SEC / 1000.0) << " ms" << std::endl;
-    std::cout << tc << std::endl;
+    test_eigen();
 
     return 0;
 }
