@@ -9,6 +9,7 @@
 #include "Eigen/Dense"
 #include "Eigen/Core"
 
+#define ITER_MAX 10000
 
 class Problem2d {
 public:

@@ -34,22 +34,12 @@ Eigen::VectorXd conjugateGradient(Eigen::MatrixXd C, Eigen::VectorXd g, Eigen::V
     Eigen::VectorXd r(s), e(s.size());
     double alpha, beta;
 
-    while (r.norm() > eps) {
+    for (int i = 0; i < ITER_MAX && r.norm() > eps; i++) {
         alpha = -1.0 * (r.dot(s) / (C * s).dot(s));
-        std::cout << "alpha = " << alpha << std::endl;
-
         y0 = y0 + alpha * s;
-        std::cout << "y0 = \n" << y0.format(OctaveFmt) << std::endl;
-
         r = r + alpha * C * s;
-        std::cout << "r0 = \n" << r.format(OctaveFmt) << std::endl;
-
         beta = -1.0 * r.dot(C * s) / (C * s).dot(s);
-        std::cout << "beta = " << beta << std::endl;
-
         s = r + beta * s;
-        std::cout << "s = " << s.format(OctaveFmt) << std::endl;
-        std::cout << "rnorm = " << r.norm() << std::endl;
     }
 
     return y0;
@@ -57,16 +47,16 @@ Eigen::VectorXd conjugateGradient(Eigen::MatrixXd C, Eigen::VectorXd g, Eigen::V
 
 Eigen::VectorXd conjugateGradientPp(Eigen::MatrixXd A, Eigen::VectorXd b, Eigen::VectorXd x0) {
     Eigen::IOFormat OctaveFmt(Eigen::StreamPrecision, 0, ", ", ";\n", "", "", "[", "]");
-    double eps = 1e-3;
-    int N_max = 2;
+    double eps = 1e-8;
+    int N_max = 4;
 
     Eigen::MatrixXd M = A.diagonal().asDiagonal();
-    Eigen::MatrixXd Minv = A.diagonal().asDiagonal().inverse();
+    Eigen::MatrixXd Minv = M.inverse();
 
     Eigen::VectorXd g = Minv.cwiseSqrt() * b;
     Eigen::VectorXd y = M.cwiseSqrt() * x0;
 
-    Eigen::VectorXd s = (Minv.cwiseSqrt() * A * Minv.cwiseSqrt()) * y - g;
+    Eigen::VectorXd s = (Minv) * y - g;
 
     Eigen::VectorXd x = Minv.cwiseSqrt() * y;
     Eigen::VectorXd sigma = Minv.cwiseSqrt() * s;
@@ -74,16 +64,14 @@ Eigen::VectorXd conjugateGradientPp(Eigen::MatrixXd A, Eigen::VectorXd b, Eigen:
     Eigen::VectorXd rho_k(rho_0.size());
 
     double alpha, beta;
-    for (int i = 0; i < N_max; i++) {
+    for (int i = 0; i < ITER_MAX && rho_0.norm() > eps; i++) {
         alpha = -1.0 * (Minv * rho_0).dot(rho_0) / (A * sigma).dot(sigma);
         x = x + alpha * sigma;
         rho_k = rho_0 + alpha * A * sigma;
-        beta = -1.0 * (Minv * rho_k).dot(rho_k) / (Minv * rho_0).dot(rho_0);
+        beta = (Minv * rho_k).dot(rho_k) / (Minv * rho_0).dot(rho_0);
         sigma = Minv * rho_k + beta * sigma;
         rho_0 = rho_k;
-        std::cout << x.format(OctaveFmt) << std::endl;
-        std::cout << (Minv.cwiseSqrt().inverse() * x).format(OctaveFmt) << std::endl;
     }
 
-    return Minv.cwiseSqrt().inverse() * x;
+    return x;
 }
