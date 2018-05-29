@@ -23,20 +23,23 @@ public:
     };
 };
 
-class Mesh {
+
+class VariMesh {
 
 public:
     Eigen::VectorXd dx, dy;
     double x_0, y_0;
     int x_nodes, y_nodes, nodes;
 
-    Mesh(int x, int y, double dx, double dy);
+    VariMesh();
 
-    Mesh(int x, int y, Eigen::VectorXd dx, Eigen::VectorXd dy);
+    VariMesh(int x, int y, double dx, double dy);
 
-    Mesh(int x, int y, double x_0, double y_0, double dx, double dy);
+    VariMesh(int x, int y, Eigen::VectorXd dx, Eigen::VectorXd dy);
 
-    Mesh(int x, int y, double x_0, double y_0, Eigen::VectorXd dx, Eigen::VectorXd dy);
+    VariMesh(int x, int y, double x_0, double y_0, double dx, double dy);
+
+    VariMesh(int x, int y, double x_0, double y_0, Eigen::VectorXd dx, Eigen::VectorXd dy);
 
 
     Loc node_d(int x, int y);

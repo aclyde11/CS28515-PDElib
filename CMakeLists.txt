@@ -7,6 +7,7 @@ include_directories(${EIGEN_INCLUDE_DIRS})
 include_directories(./build/eigen/src/eigen)
 
 set(CMAKE_CXX_STANDARD 11)
+
 add_definitions(-Wall -std=c++0x)
 
 
