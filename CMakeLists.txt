@@ -4,7 +4,6 @@ project(CS28515Proj1)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
 include(eigen)
 include_directories(${EIGEN_INCLUDE_DIRS})
-include_directories(./build/eigen/src/eigen)
 
 set(CMAKE_CXX_STANDARD 11)
 

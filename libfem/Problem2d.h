@@ -10,6 +10,7 @@
 #include "Eigen/Core"
 
 #define ITER_MAX 10000
+#define EPS 1e-8
 
 class Problem2d {
 public:
