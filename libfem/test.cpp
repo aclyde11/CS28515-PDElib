@@ -2,42 +2,28 @@
 // Created by Austin Clyde on 5/23/18.
 //
 #include <iostream>
-#include "Eigen/Dense"
+#include "Eigen/Core"
 
 #include "test.h"
 #include "VariMesh.h"
 #include "Problem2d.h"
+#include <cmath>
 
 
 using Eigen::MatrixXd;
 void test_eigen() {
-
-    Eigen::MatrixXd A(2, 2);
-    A << 2, -1, -1, 2;
-
-    Eigen::VectorXd b(2);
-    b << 1, 0;
-
-    Eigen::VectorXd c(2);
-    c << 0, 0;
-
-    Eigen::MatrixXd result = conjugateGradient(A, b, c);
-    std::cout << "Withput PC = \n " << result << std::endl;
-    result = conjugateGradientPp(A, b, c);
-    std::cout << "with PC = \n " << result << std::endl;
-
-    A.resize(3, 3);
-    A << 4, -1, 1,
-            -1, 4, -2,
-            1, -2, 4;
-
-    b.resize(3);
-    b << 12, -1, 5;
-
-    c.resize(3);
-    c << 0, 0, 0;
-    result = conjugateGradient(A, b, c);
-    std::cout << "Withput PC = \n " << result << std::endl;
-    result = conjugateGradientPp(A, b, c);
-    std::cout << "with PC = \n " << result << std::endl;
+    int x_nodes = 30;
+    int y_nodes = 30;
+    VariMesh mesh(x_nodes, y_nodes, M_PI / x_nodes, M_PI / y_nodes);
+    Eigen::MatrixXd init_m(30, 30);
+    for (int i = 0; i < mesh.x_nodes; i++) {
+        for (int j = 0; j < mesh.y_nodes; j++) {
+            init_m(i, j) = 5 * sin(mesh.node_loc(i, j).x) * sin(2 * mesh.node_loc(i, j).y);
+        }
+    }
+    Eigen::VectorXd F = Eigen::Map<Eigen::VectorXd>(init_m.data(), init_m.size());
+    Eigen::VectorXd guess(F.size());
+    Eigen::VectorXd ans = conjugateGradientPreconditioningNM(F, guess, multiplyStiff, generateStiffD(mesh), mesh);
+    write_coords(F, mesh, "coords.txt");
 }
+
