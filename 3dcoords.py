@@ -8,13 +8,19 @@ import pylab
 
 import pandas as pd
 
-data = pd.read_csv("/Users/austin/CLionProjects/CS28515Proj1/cmake-build-debug/main/coords.txt", header=None)
-x = np.array(data[0])
-y = np.array(data[1])
-z = np.array(data[2])
+import sys
+import os
+
+data = pd.read_csv("/Users/austin/CLionProjects/CS28515Proj1/cmake-build-debug/main/coords_" + sys.argv[1] + ".txt",
+                   header=None)
+X = np.array(data[0])
+Y = np.array(data[1])
+Z = np.array(data[2])
 fig = plt.figure()
 ax = plt.axes(projection='3d')
-ax.scatter3D(x, y, z, c=z, cmap='Greens');
+ax.scatter3D(X, Y, Z, c=Z, cmap='Greens');
+# ax.plot_wireframe(X, Y, Z, color='black')
+
 pylab.show()
 fig.show()
 fig.savefig("/Users/austin/Desktop/plot.png")

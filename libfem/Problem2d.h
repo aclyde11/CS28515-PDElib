@@ -15,7 +15,7 @@
 #include <vector>
 #include <fstream>
 
-#define ITER_MAX 1000
+#define ITER_MAX 900
 #define EPS 1e-3
 
 class Problem2d {

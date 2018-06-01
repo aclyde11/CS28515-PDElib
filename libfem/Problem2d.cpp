@@ -24,12 +24,23 @@ Eigen::VectorXd multiplyStiff(Eigen::VectorXd v, VariMesh mesh) {
             a = 1.0 / (2.0 * r);
             b = r / 2.0;
 
-            Y(i, j) += a * (Z(i, j) - Z(i, j + 1)) + b * (Z(i, j) - Z(i + 1, j + 1));
+            Y(i, j) += a * (Z(i, j) - Z(i, j + 1)) + b * (Z(i, j) - Z(i + 1, j));
             Y(i + 1, j) += a * (Z(i + 1, j) - Z(i + 1, j + 1)) + b * (Z(i + 1, j) - Z(i, j));
-            Y(i, j + 1) += a * (Z(i, j + 1) - Z(i + 1, j + 1)) + b * (Z(i, j + 1) - Z(i, j));
-            Y(i + 1, j + 1) += a * (Z(i + 1, j + 1) - Z(i + 1, j + 1)) + b * (Z(i + 1, j + 1) - Z(i + 1, j + 1));
+            Y(i, j + 1) += a * (Z(i, j + 1) - Z(i, j)) + b * (Z(i, j + 1) - Z(i + 1, j + 1));
+            Y(i + 1, j + 1) += a * (Z(i + 1, j + 1) - Z(i + 1, j)) + b * (Z(i + 1, j + 1) - Z(i, j + 1));
         }
     }
+
+
+    for (int i = 0; i < mesh.x_nodes; i++) {
+        Y(i, 0) = Z(i, 0);
+        Y(i, mesh.y_nodes - 1) = Z(i, mesh.y_nodes - 1);
+    }
+    for (int j = 0; j < mesh.y_nodes; j++) {
+        Y(0, j) = Z(0, j);
+        Y(mesh.x_nodes - 1, j) = Z(mesh.x_nodes - 1, j);
+    }
+
     return Eigen::Map<Eigen::VectorXd>(Y.data(), Y.size());
 }
 
@@ -105,24 +116,24 @@ Eigen::VectorXd conjugateGradientPreconditioningNM(Eigen::VectorXd b, Eigen::Vec
     Eigen::VectorXd M = D;
     Eigen::VectorXd Minv = D.cwiseInverse();
 
-    Eigen::VectorXd g = Minv.cwiseSqrt().cwiseProduct(b);
-    Eigen::VectorXd y = M.cwiseSqrt().cwiseProduct(x0);
-    Eigen::VectorXd s = Minv.cwiseProduct(y) - g;
-    Eigen::VectorXd x = Minv.cwiseSqrt().cwiseProduct(y);
-    Eigen::VectorXd sigma = Minv.cwiseSqrt().cwiseProduct(s);
-    Eigen::VectorXd rho_0 = M.cwiseSqrt().cwiseProduct(s);
+    Eigen::VectorXd x = x0;
+    Eigen::VectorXd rho_0 = Amul(x0, mesh) - b;
+    Eigen::VectorXd sigma = Minv.cwiseProduct(rho_0);
     Eigen::VectorXd rho_k(rho_0.size());
-
+    double init_norm = rho_0.norm();
+    std::cout << "init norm: " << rho_0.norm() << std::endl;
     double alpha, beta;
     int i = 0;
-    for (i = 0; i < ITER_MAX && rho_0.norm() > EPS; i++) {
+    for (i = 0; i < ITER_MAX && rho_0.norm() >= 0.00001; i++) {
         alpha = -1.0 * (Minv.cwiseProduct(rho_0)).dot(rho_0) / (Amul(sigma, mesh)).dot(sigma);
         x = x + alpha * sigma;
         rho_k = rho_0 + alpha * Amul(sigma, mesh);
         beta = (Minv.cwiseProduct(rho_k)).dot(rho_k) / (Minv.cwiseProduct(rho_0)).dot(rho_0);
         sigma = Minv.cwiseProduct(rho_k) + beta * sigma;
         rho_0 = rho_k;
+        std::cout << "i = " << i << ", rho norm = " << rho_k.norm() << std::endl;
     }
+    std::cout << "ITERS = " << i << std::endl;
     return x;
 }
 
