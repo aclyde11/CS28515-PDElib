@@ -13,11 +13,11 @@
 using Eigen::MatrixXd;
 void test_eigen() {
     int x_nodes = 30;
-    int y_nodes = 30;
+    int y_nodes = 50;
 
     VariMesh mesh(x_nodes, y_nodes, M_PI / (x_nodes - 1), M_PI / (y_nodes - 1));
 
-    Eigen::MatrixXd init_m(30, 30);
+    Eigen::MatrixXd init_m(x_nodes, y_nodes);
     for (int i = 0; i < mesh.x_nodes; i++) {
         for (int j = 0; j < mesh.y_nodes; j++) {
             init_m(i, j) = 5 * sin(mesh.node_loc(i, j).x) * sin(2 * mesh.node_loc(i, j).y) * mesh.dx[0] * mesh.dy[0];
