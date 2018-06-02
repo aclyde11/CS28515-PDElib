@@ -5,10 +5,7 @@
 #include "FEMLaplacian.h"
 
 FEMLaplacian::FEMLaplacian() {
-    mesh = VariMesh(4, 4, 0.1, 0.1);
-    b = Eigen::VectorXd(16);
-    U = Eigen::VectorXd(16);
-    file = "test.txt";
+    ;
 }
 
 FEMLaplacian::FEMLaplacian(VariMesh mesh, std::function<double(int, int, VariMesh)> u_init, std::string file,
@@ -52,7 +49,7 @@ Eigen::VectorXd FEMLaplacian::conjugateGradientPreconditioningNM(Eigen::VectorXd
     std::cout << "init norm: " << rho_0.norm() << std::endl;
     double alpha, beta;
     int i = 0;
-    for (i = 0; i < ITER_MAX && rho_0.norm() >= 0.00001; i++) {
+    for (i = 0; i < ITER_MAX && rho_0.norm() >= init_norm / 1000; i++) {
         alpha = -1.0 * (Minv.cwiseProduct(rho_0)).dot(rho_0) / (Amul(sigma, mesh)).dot(sigma);
         x = x + alpha * sigma;
         rho_k = rho_0 + alpha * Amul(sigma, mesh);
@@ -67,11 +64,6 @@ Eigen::VectorXd FEMLaplacian::conjugateGradientPreconditioningNM(Eigen::VectorXd
 
 Eigen::VectorXd multiplyStiffExample0(Eigen::VectorXd v, VariMesh mesh) {
     Eigen::MatrixXd Y(mesh.x_nodes, mesh.y_nodes);
-    for (int i = 0; i < mesh.x_nodes; i++) {
-        for (int j = 0; j < mesh.y_nodes; j++)
-            Y(i, j) = 0;
-    }
-
     Eigen::MatrixXd Z = Eigen::Map<Eigen::MatrixXd>(v.data(), mesh.x_nodes, mesh.y_nodes);
     double r, a, b;
     for (int i = 0; i < mesh.x_nodes - 1; i++) {
@@ -102,11 +94,6 @@ Eigen::VectorXd multiplyStiffExample0(Eigen::VectorXd v, VariMesh mesh) {
 
 Eigen::VectorXd multiplyStiffExample1(Eigen::VectorXd v, VariMesh mesh) {
     Eigen::MatrixXd Y(mesh.x_nodes, mesh.y_nodes);
-    for (int i = 0; i < mesh.x_nodes; i++) {
-        for (int j = 0; j < mesh.y_nodes; j++)
-            Y(i, j) = 0;
-    }
-
     Eigen::MatrixXd Z = Eigen::Map<Eigen::MatrixXd>(v.data(), mesh.x_nodes, mesh.y_nodes);
     double r, a, b;
     for (int i = 0; i < mesh.x_nodes - 1; i++) {
@@ -137,10 +124,6 @@ Eigen::VectorXd multiplyStiffExample1(Eigen::VectorXd v, VariMesh mesh) {
 
 Eigen::VectorXd generateStiffD(VariMesh mesh) {
     Eigen::MatrixXd Y(mesh.x_nodes, mesh.y_nodes);
-    for (int i = 0; i < mesh.x_nodes; i++) {
-        for (int j = 0; j < mesh.y_nodes; j++)
-            Y(i, j) = 0;
-    }
 
     double r, a, b;
     for (int i = 0; i < mesh.x_nodes - 1; i++) {
@@ -217,5 +200,3 @@ void write_coords(Eigen::VectorXd X, VariMesh mesh, std::string file) {
     }
     ofs.close();
 }
-
-
