@@ -4,10 +4,6 @@
 
 #include "FEMLaplacian.h"
 
-FEMLaplacian::FEMLaplacian() {
-    ;
-}
-
 FEMLaplacian::FEMLaplacian(VariMesh mesh, std::function<double(int, int, VariMesh)> u_init, std::string file,
                            std::function<Eigen::VectorXd(Eigen::VectorXd, VariMesh)> Amul,
                            std::function<Eigen::VectorXd(VariMesh)> GenDiag) {
@@ -24,7 +20,7 @@ FEMLaplacian::FEMLaplacian(VariMesh mesh, std::function<double(int, int, VariMes
 
     b = Eigen::Map<Eigen::VectorXd>(init_m.data(), init_m.size());
     U = Eigen::VectorXd(b.size());
-    D = GenDiag(mesh);
+    D = generateStiffDEx1(mesh);
 }
 
 void FEMLaplacian::run() {
@@ -33,11 +29,17 @@ void FEMLaplacian::run() {
     write_coords(U, mesh, file);
 }
 
+
+void FEMLaplacian::run(Eigen::VectorXd init) {
+    Eigen::VectorXd U = conjugateGradientPreconditioningNMEx0(init);
+    write_coords(U, mesh, file);
+}
+
 void FEMLaplacian::write_out_mesh(std::string file) {
     write_coords(b, mesh, file);
 }
 
-Eigen::VectorXd FEMLaplacian::conjugateGradientPreconditioningNM(Eigen::VectorXd x0) {
+Eigen::VectorXd FEMLaplacian::conjugateGradientPreconditioningNMEx0(Eigen::VectorXd x0) {
     Eigen::VectorXd M = D;
     Eigen::VectorXd Minv = D.cwiseInverse();
 
@@ -54,8 +56,44 @@ Eigen::VectorXd FEMLaplacian::conjugateGradientPreconditioningNM(Eigen::VectorXd
         x = x + alpha * sigma;
         rho_k = rho_0 + alpha * Amul(sigma, mesh);
         beta = (Minv.cwiseProduct(rho_k)).dot(rho_k) / (Minv.cwiseProduct(rho_0)).dot(rho_0);
-        sigma = Minv.cwiseProduct(rho_k) + beta * sigma;
+        sigma = -1.0 * Minv.cwiseProduct(rho_k) + beta * sigma;
         rho_0 = rho_k;
+        std::cout << "i = " << i << ", rho norm = " << rho_k.norm() << std::endl;
+    }
+    std::cout << "ITERS = " << i << std::endl;
+    return x;
+}
+
+Eigen::VectorXd FEMLaplacian::conjugateGradientPreconditioningNM(Eigen::VectorXd x0) {
+    Eigen::VectorXd M = D;
+    Eigen::VectorXd Minv = D.cwiseInverse();
+
+    Eigen::VectorXd x = x0;
+    Eigen::VectorXd rho_0 = Amul(x0, mesh) - b;
+    Eigen::VectorXd sigma = Minv.cwiseProduct(rho_0);
+    Eigen::VectorXd rho_k(rho_0.size());
+    Eigen::MatrixXd rho_map;
+    double init_norm = rho_0.norm();
+    std::cout << "init norm: " << rho_0.norm() << std::endl;
+    double alpha, beta;
+    int i = 0;
+    for (i = 0; i < ITER_MAX && rho_0.norm() >= init_norm / 100; i++) {
+        rho_map = Eigen::Map<Eigen::MatrixXd>(rho_0.data(), mesh.x_nodes, mesh.y_nodes);
+        for (int i = 0; i < mesh.x_nodes; i++) {
+            rho_map(i, mesh.y_nodes - 1) = 0;
+        }
+        for (int j = 0; j < mesh.y_nodes; j++) {
+            rho_map(0, j) = 0;
+        }
+
+
+        rho_0 = Eigen::Map<Eigen::VectorXd>(rho_map.data(), rho_map.size());
+
+        alpha = -1.0 * (Minv.cwiseProduct(rho_0)).dot(rho_0) / (Amul(sigma, mesh)).dot(sigma);
+        x = x + alpha * sigma;
+        rho_k = rho_0 + alpha * Amul(sigma, mesh);
+        beta = (Minv.cwiseProduct(rho_k)).dot(rho_k) / (Minv.cwiseProduct(rho_0)).dot(rho_0);
+        sigma = Minv.cwiseProduct(rho_k) + beta * sigma;
         std::cout << "i = " << i << ", rho norm = " << rho_k.norm() << std::endl;
     }
     std::cout << "ITERS = " << i << std::endl;
@@ -64,6 +102,11 @@ Eigen::VectorXd FEMLaplacian::conjugateGradientPreconditioningNM(Eigen::VectorXd
 
 Eigen::VectorXd multiplyStiffExample0(Eigen::VectorXd v, VariMesh mesh) {
     Eigen::MatrixXd Y(mesh.x_nodes, mesh.y_nodes);
+    for (int i = 0; i < mesh.x_nodes; i++) {
+        for (int j = 0; j < mesh.y_nodes; j++)
+            Y(i, j) = 0;
+    }
+
     Eigen::MatrixXd Z = Eigen::Map<Eigen::MatrixXd>(v.data(), mesh.x_nodes, mesh.y_nodes);
     double r, a, b;
     for (int i = 0; i < mesh.x_nodes - 1; i++) {
@@ -102,6 +145,11 @@ Eigen::VectorXd multiplyStiffExample1(Eigen::VectorXd v, VariMesh mesh) {
             a = 1.0 / (2.0 * r);
             b = r / 2.0;
 
+            if (mesh.node_loc(i, j).x < 0.5) {
+                a *= 5;
+                b *= 5;
+            }
+
             Y(i, j) += a * (Z(i, j) - Z(i, j + 1)) + b * (Z(i, j) - Z(i + 1, j));
             Y(i + 1, j) += a * (Z(i + 1, j) - Z(i + 1, j + 1)) + b * (Z(i + 1, j) - Z(i, j));
             Y(i, j + 1) += a * (Z(i, j + 1) - Z(i, j)) + b * (Z(i, j + 1) - Z(i + 1, j + 1));
@@ -109,20 +157,40 @@ Eigen::VectorXd multiplyStiffExample1(Eigen::VectorXd v, VariMesh mesh) {
         }
     }
 
-
     for (int i = 0; i < mesh.x_nodes; i++) {
-        Y(i, 0) = Z(i, 0);
-        Y(i, mesh.y_nodes - 1) = Z(i, mesh.y_nodes - 1);
+        Y(i, mesh.y_nodes - 1) = 0;
     }
     for (int j = 0; j < mesh.y_nodes; j++) {
-        Y(0, j) = Z(0, j);
-        Y(mesh.x_nodes - 1, j) = Z(mesh.x_nodes - 1, j);
+        Y(0, j) = 0;
     }
+
 
     return Eigen::Map<Eigen::VectorXd>(Y.data(), Y.size());
 }
 
-Eigen::VectorXd generateStiffD(VariMesh mesh) {
+Eigen::VectorXd generateStiffDEx1(VariMesh mesh) {
+    Eigen::MatrixXd Y(mesh.x_nodes, mesh.y_nodes);
+
+    double r, a, b;
+    for (int i = 0; i < mesh.x_nodes - 1; i++) {
+        for (int j = 0; j < mesh.y_nodes - 1; j++) {
+            r = mesh.dy[j] / mesh.dx[i];
+            a = 1.0 / (2.0 * r);
+            b = r / 2.0;
+            if (mesh.node_loc(i, j).x < 0.5) {
+                a *= 5;
+                b *= 5;
+            }
+            Y(i, j) += a + b;
+            Y(i + 1, j) += a + b;
+            Y(i, j + 1) += a + b;
+            Y(i + 1, j + 1) += a + b;
+        }
+    }
+    return Eigen::Map<Eigen::VectorXd>(Y.data(), Y.size());
+}
+
+Eigen::VectorXd generateStiffDEx0(VariMesh mesh) {
     Eigen::MatrixXd Y(mesh.x_nodes, mesh.y_nodes);
 
     double r, a, b;
